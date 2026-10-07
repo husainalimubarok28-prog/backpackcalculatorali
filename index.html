@@ -61,10 +61,31 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 .mbar{position:fixed;left:0;right:0;bottom:0;background:var(--g);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;z-index:5}
 .mbar b{font:800 20px "Bricolage Grotesque",sans-serif}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+html,body{overflow-x:hidden}
+input,select,textarea{min-width:0;max-width:100%}
+.g2>*,.st>*,.bk>*,.xi>*{min-width:0}
+@media(max-width:640px){
+ .wrap{padding:16px 12px}
+ .grid{grid-template-columns:1fr}
+ .g2{grid-template-columns:1fr}
+ .st{grid-template-columns:1fr 1fr}
+ .bk{flex-direction:column;align-items:stretch}
+ .donut{align-self:center}
+ .city .r{grid-template-columns:1fr 1fr}
+ .r4{grid-template-columns:1fr 1fr}
+ h1{font-size:clamp(24px,7.5vw,34px)}
+ .seg button{font-size:13px;padding:10px 1px}
+ .pn,details{padding:12px 12px}
+}
+@media(max-width:380px){
+ .st{grid-template-columns:1fr}
+ .chips{grid-template-columns:1fr 1fr}
+ .seg button{font-size:12px}
+}
 </style></head><body>
 <div class="wrap">
 <h1>Backpacking Budget Calculator</h1>
-<p class="sub">Isi rencana perjalananmu, hasilnya langsung berubah. Semua hitungan jalan di browser. Masuk dengan Google/email (opsional) agar data sinkron antar perangkat.</p>
+<p class="sub">Isi rencana perjalananmu, hasilnya langsung berubah. Semua hitungan jalan di browser. Masuk dengan Google (opsional) agar data sinkron antar perangkat.</p>
 <div class="seg" id="tabs" style="grid-template-columns:1fr 1fr;margin-bottom:16px"><button data-v="p" aria-pressed="true">📊 Rencana</button><button data-v="t" aria-pressed="false">🧾 Catat Trip</button></div>
 <section class="pn" id="acct" style="margin-bottom:16px">
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
