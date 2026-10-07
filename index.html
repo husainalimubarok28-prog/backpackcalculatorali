@@ -169,7 +169,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <div class="top" style="margin:10px 0 0"><button class="btn" id="xclear">Kosongkan pengeluaran</button></div>
 <p class="hint" id="xm3" role="status"></p></section>
 <section class="pn"><h2>Catat pengeluaran</h2>
-<label for="xa">Jumlah</label><input id="xa" type="number" min="0" step="any" inputmode="decimal" placeholder="0" autocomplete="off">
+<label for="xa">Jumlah</label><input id="xa" type="text" inputmode="numeric" placeholder="0" autocomplete="off" data-money="1">
 <label>Mata uang</label><div class="seg" id="xcur" style="grid-template-columns:1fr 1fr"><button data-xcur="idr" aria-pressed="true">Rp</button><button data-xcur="loc" aria-pressed="false" id="xcl">Lokal</button></div>
 <p class="hint" id="xp"></p>
 <label>Kategori</label><div class="chips" id="xcat"></div>
@@ -191,17 +191,23 @@ input,select,textarea{min-width:0;max-width:100%}
 (function(){
 var $=function(i){return document.getElementById(i)};
 var rp=function(n){return "Rp."+Math.round(isFinite(n)?n:0).toLocaleString("id-ID")};
+var grpNum=function(n){return Math.round(isFinite(n)?n:0).toLocaleString("id-ID")};
+var parseMoney=function(v){var s=String(v==null?"":v).replace(/[^0-9,.-]/g,"");if(!s)return 0;if(s.indexOf(",")>-1)s=s.replace(/\./g,"").replace(",",".");else s=s.replace(/\./g,"");var n=parseFloat(s);return isFinite(n)?n:0};
+var moneyStr=function(n){return "Rp."+grpNum(n)};
+var fmtMoney=function(el){if(!el)return;var raw=String(el.value).replace(/[^0-9,.-]/g,"");el.value=raw===""?"":moneyStr(parseMoney(raw))};
+var fmtAllMoney=function(){document.querySelectorAll("input[data-money]").forEach(fmtMoney)};
+var setMoney=function(id,n){var el=$(id);if(el)el.value=moneyStr(n)};
 var F=[["✈️ Transportasi",[["fly1","Tiket pesawat pergi",1000000],["fly2","Tiket pesawat pulang",1000000],["bus","Bus (total)",0],["train","Kereta (total)",0],["ferry","Ferry (total)",0],["local","Transportasi lokal / hari",50000,1],["apt","Airport transfer (total)",0]]],
 ["🏠 Akomodasi",[["stay","Harga penginapan / malam (per kamar)",150000,1],["room","Orang per kamar",1],["nights","Jumlah malam (kosong = hari − 1)",""]]],
 ["🍜 Makanan",[["bf","Sarapan / hari",20000,1],["lunch","Makan siang / hari",35000,1],["dinner","Makan malam / hari",35000,1],["snack","Snack / kopi / hari",10000,1]]],
 ["🎟️ Aktivitas",[["tix","Tiket wisata (total)",300000,1],["tour","Tour (total)",0],["actx","Aktivitas lainnya (total)",0]]],
 ["🛂 Dokumen & perjalanan",[["visa","Visa",0],["ins","Asuransi",0],["pass","Paspor / dokumen",0],["sim","SIM card / eSIM",100000]]],
 ["🛍️ Lain-lain",[["laundry","Laundry (total)",0],["shop","Belanja (total)",0],["souv","Souvenir (total)",0],["unexp","Biaya tak terduga (total)",0]]]];
-var DEF={},BASE={},h="";
+var DEF={},BASE={},h="",NONM={room:1,nights:1};
 var EX={2:'<div class="chk"><input type="checkbox" id="fpd"><label for="fpd" style="margin:0;color:var(--ink)">Catat makan per hari</label></div><p class="hint">Satu baris untuk tiap hari perjalanan. Isian makan di atas dinonaktifkan.</p><div id="fdays"></div>',3:'<div class="chk"><input type="checkbox" id="apd"><label for="apd" style="margin:0;color:var(--ink)">Catat aktivitas per hari</label></div><p class="hint">Satu baris untuk tiap hari perjalanan. Isian aktivitas di atas dinonaktifkan.</p><div id="adays"></div>'};
 F.forEach(function(s,si){h+='<details><summary>'+s[0]+'</summary><div class="g2">';
- s[1].forEach(function(f){DEF[f[0]]=f[2];if(f[3])BASE[f[0]]=f[2];
-  h+='<div><label for="'+f[0]+'">'+f[1]+'</label><input id="'+f[0]+'" type="number" min="0" step="any" inputmode="decimal" data-l="'+f[1].replace(/ \(.*|\s\/.*/,"")+'"'+(f[3]?' data-cost':'')+'"></div>'});
+ s[1].forEach(function(f){DEF[f[0]]=f[2];if(f[3])BASE[f[0]]=f[2];var mny=!NONM[f[0]];
+  h+='<div><label for="'+f[0]+'">'+f[1]+'</label><input id="'+f[0]+'" '+(mny?'type="text" inputmode="numeric" autocomplete="off" data-money="1"':'type="number" min="0" step="any" inputmode="decimal"')+' data-l="'+f[1].replace(/ \(.*|\s\/.*/,"")+'"'+(f[3]?' data-cost':'')+'></div>'});
  h+='</div>'+(EX[si]||'')+'</details>'});
 $("secs").innerHTML=h;
 var LM=null,EXP=[],curDay=1,dayInit=false,xcat="mk",xcur="idr",ready=false,restoring=false,lastJ="",saveT=0,dF=[],dA=[],dAn=[],lastN=-1,REP="",RPT=null,cities=[],style="b",mult=1,bpm=false,A=null,B=null,warns={};
@@ -234,7 +240,7 @@ function autoRate(code){
   if(v>0){$("rate").value=Math.round(1/v);rateNote="Kurs "+code+" terisi otomatis dari data terbaru ("+new Date().toLocaleDateString("id-ID")+"). Bisa diubah manual.";setRhint(rateNote);calc()}
   else if(!fb)setRhint("Kurs "+code+" tidak ditemukan. Isi manual ya.")})}
 var CAT=[["tr","✈️","Transportasi","#6B1F2A"],["st","🏠","Akomodasi","#7DB9DE"],["fo","🍜","Makanan","#C07A3E"],["ac","🎟️","Aktivitas","#3F7D58"],["dc","🛂","Dokumen","#8C8175"],["ms","🛍️","Lain-lain","#1A1614"],["eg","🛡️","Dana darurat","#5C5349"]];
-function N(id){var r=parseFloat($(id).value);if(r<0){warns[$(id).dataset.l+" tidak boleh negatif, dihitung 0"]=1;return 0}return isFinite(r)?r:0}
+function N(id){var e=$(id);var r=e.dataset.money?parseMoney(e.value):parseFloat(e.value);if(r<0){warns[e.dataset.l+" tidak boleh negatif, dihitung 0"]=1;return 0}return isFinite(r)?r:0}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function r5(x){return Math.round(x/5000)*5000}
 function daysCalc(){
@@ -318,8 +324,8 @@ function cmp(m){
  $("cmp").innerHTML=o}
 function snap(k){var m=model();var x={n:$(k==="A"?"na":"nb").value||"Rute "+k,t:m.total,p:m.pp,d:m.days};if(k==="A")A=x;else B=x;calc()}
 function drawC(){$("cities").innerHTML=cities.map(function(c,i){
- var f=[["d","Hari"],["stay","Inap/malam"],["food","Makan/hari"],["local","Lokal/hari"],["act","Aktivitas"]];
- return'<div class="city"><div class="n"><input data-i="'+i+'" data-k="n" value="'+esc(c.n)+'" aria-label="Nama kota"><button class="btn sm" data-del="'+i+'" aria-label="Hapus kota">✕</button></div><div class="r">'+f.map(function(x){return'<div><label>'+x[1]+'</label><input type="number" min="0" inputmode="decimal" data-i="'+i+'" data-k="'+x[0]+'" value="'+c[x[0]]+'"></div>'}).join("")+'</div></div>'}).join("")}
+ var f=[["d","Hari",0],["stay","Inap/malam",1],["food","Makan/hari",1],["local","Lokal/hari",1],["act","Aktivitas",1]];
+ return'<div class="city"><div class="n"><input data-i="'+i+'" data-k="n" value="'+esc(c.n)+'" aria-label="Nama kota"><button class="btn sm" data-del="'+i+'" aria-label="Hapus kota">✕</button></div><div class="r">'+f.map(function(x){return'<div><label>'+x[1]+'</label><input '+(x[2]?'type="text" inputmode="numeric" autocomplete="off" data-money="1" value="'+moneyStr(c[x[0]])+'"':'type="number" min="0" inputmode="decimal" value="'+c[x[0]]+'"')+' data-i="'+i+'" data-k="'+x[0]+'"></div>'}).join("")+'</div></div>'}).join("")}
 function lockFields(){var mu=$("multi").checked,f=$("fpd").checked,a=$("apd").checked;
  ["stay","local"].forEach(function(i){$(i).disabled=mu});["bf","lunch","dinner","snack"].forEach(function(i){$(i).disabled=mu||f});["tix","tour","actx"].forEach(function(i){$(i).disabled=a})}
 function updF(){var t=0;dF.forEach(function(r,i){var x=r[0]+r[1]+r[2]+r[3];t+=x;var e=$("fs"+i);if(e)e.textContent="Total hari ini: "+rp(x)});var e=$("ft");if(e)e.textContent="Total makan semua hari: "+rp(t)+" per orang"}
@@ -331,29 +337,31 @@ function syncDays(){
  dF=dF.slice(0,n);dA=dA.slice(0,n);dAn=dAn.slice(0,n);
  for(i=0;i<n;i++){if(!dF[i])dF[i]=(dF[i-1]||d0).slice();if(dA[i]==null)dA[i]=ap;if(dAn[i]==null)dAn[i]=""}
  var fh="",ah="";
- if($("fpd").checked){for(i=0;i<n;i++)fh+='<div class="dr"><b>Hari '+(i+1)+'</b><div class="r4">'+["Sarapan","Siang","Malam","Snack"].map(function(l,j){return'<div><label>'+l+'</label><input type="number" min="0" inputmode="decimal" data-pd="f" data-i="'+i+'" data-j="'+j+'" value="'+dF[i][j]+'"></div>'}).join("")+'</div><span class="hint" id="fs'+i+'"></span></div>';fh+='<p class="hint" id="ft" style="font-weight:700;color:var(--ink)"></p>'}
- if($("apd").checked){for(i=0;i<n;i++)ah+='<div class="dr"><b>Hari '+(i+1)+'</b><div class="r2"><div><label>Biaya aktivitas</label><input type="number" min="0" inputmode="decimal" data-pd="a" data-i="'+i+'" value="'+dA[i]+'"></div><div><label>Catatan</label><input maxlength="60" data-pd="n" data-i="'+i+'" value="'+esc(dAn[i])+'" placeholder="mis. tiket candi"></div></div></div>';ah+='<p class="hint" id="at" style="font-weight:700;color:var(--ink)"></p>'}
+ if($("fpd").checked){for(i=0;i<n;i++)fh+='<div class="dr"><b>Hari '+(i+1)+'</b><div class="r4">'+["Sarapan","Siang","Malam","Snack"].map(function(l,j){return'<div><label>'+l+'</label><input type="text" inputmode="numeric" autocomplete="off" data-money="1" data-pd="f" data-i="'+i+'" data-j="'+j+'" value="'+moneyStr(dF[i][j])+'"></div>'}).join("")+'</div><span class="hint" id="fs'+i+'"></span></div>';fh+='<p class="hint" id="ft" style="font-weight:700;color:var(--ink)"></p>'}
+ if($("apd").checked){for(i=0;i<n;i++)ah+='<div class="dr"><b>Hari '+(i+1)+'</b><div class="r2"><div><label>Biaya aktivitas</label><input type="text" inputmode="numeric" autocomplete="off" data-money="1" data-pd="a" data-i="'+i+'" value="'+moneyStr(dA[i])+'"></div><div><label>Catatan</label><input maxlength="60" data-pd="n" data-i="'+i+'" value="'+esc(dAn[i])+'" placeholder="mis. tiket candi"></div></div></div>';ah+='<p class="hint" id="at" style="font-weight:700;color:var(--ink)"></p>'}
  $("fdays").innerHTML=fh;$("adays").innerHTML=ah;updF();updA()}
 function lockMulti(){var on=$("multi").checked;$("mb").hidden=!on;lockFields();
  if(on&&!cities.length){var fs=N("bf")+N("lunch")+N("dinner")+N("snack");cities=[{n:$("city").value||"Kota 1",d:Math.max(1,daysCalc()||3),stay:N("stay"),food:fs,local:N("local"),act:0}];drawC()}}
 function paint(){document.querySelectorAll("#seg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.s===style)});$("bpm").setAttribute("aria-pressed",bpm)}
 function setStyle(s){
  var mm={h:.6,n:1,m:2.2}[s]||1,old=mult;mult=mm;
- for(var k in BASE)$(k).value=r5(BASE[k]*mm);
+ for(var k in BASE)setMoney(k,r5(BASE[k]*mm));
  cities.forEach(function(c){["stay","food","local","act"].forEach(function(k){c[k]=r5(c[k]/old*mm)})});drawC();
  style=s;paint()}
 function reset(){
- for(var k in DEF)$(k).value=DEF[k];
+ for(var k in DEF){if(NONM[k])$(k).value=DEF[k];else setMoney(k,DEF[k])}
  $("country").value="Thailand";$("city").value="Bangkok";$("start").value="2026-11-20";$("end").value="2026-11-26";$("man").checked=false;$("people").value=1;$("cur").value="THB";$("rate").value=500;
  $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];drawC();lockMulti();syncDays();
  A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="n";paint();$("days").disabled=true;calc();buildCityList($("country").value)}
+document.addEventListener("focusin",function(e){var t=e.target;if(t&&t.dataset&&t.dataset.money&&String(t.value).trim()!==""){t.value=String(parseMoney(t.value));setTimeout(function(){try{t.select()}catch(x){}},0)}});
+document.addEventListener("focusout",function(e){var t=e.target;if(t&&t.dataset&&t.dataset.money)fmtMoney(t)});
 document.addEventListener("input",function(e){var t=e.target;
  if(t.closest("#tv")){if(t.id==="xd"){curDay=+t.value||1;renderTrip()}else updPrev();return}
- if(t.dataset.pd){var i=+t.dataset.i,v=Math.max(0,parseFloat(t.value)||0);
+ if(t.dataset.pd){var i=+t.dataset.i,v=Math.max(0,t.dataset.money?parseMoney(t.value):(parseFloat(t.value)||0));
   if(t.dataset.pd==="f")dF[i][+t.dataset.j]=v;else if(t.dataset.pd==="a")dA[i]=v;else dAn[i]=t.value;
   updF();updA();calc();return}
  if(t.id==="fpd"||t.id==="apd"){lastN=-1;lockFields();syncDays()}
- if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:Math.max(0,parseFloat(t.value)||0)}
+  if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:(t.dataset.money?parseMoney(t.value):Math.max(0,parseFloat(t.value)||0))}
  if(t.id==="country"){var cn=t.value.trim(),cc=CUR[cn];if(cc){$("cur").value=cc;autoRate(cc)}buildCityList(cn)}
  if(t.id==="cp")$("cpc").disabled=t.value!=="c";
  if(t.id==="man")$("days").disabled=!t.checked;
@@ -421,7 +429,7 @@ function autoDay(m){var d=sd();if(!d)return 1;var n=new Date(),t=new Date(n.getF
 function xmsg(t){$("xm").textContent=t}
 function showView(v){var tv=v==="t";$("pv").hidden=tv;$("tv").hidden=!tv;document.querySelector(".mbar").hidden=tv;
  document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===v)});window.scrollTo(0,0);renderTrip()}
-function updPrev(){var v=parseFloat($("xa").value),r=parseFloat($("rate").value)||0,c=($("cur").value||"").toUpperCase();
+function updPrev(){var v=parseMoney($("xa").value),r=parseFloat($("rate").value)||0,c=($("cur").value||"").toUpperCase();
  $("xp").textContent=xcur==="loc"?(r>0?(v>0?"≈ "+rp(v*r):"Kurs: 1 "+(c||"lokal")+" = "+rp(r)):"Isi kurs di tab Rencana dulu"):""}
 function catName(c){for(var i=0;i<XC.length;i++)if(XC[i][0]===c)return XC[i][2];return c}
 function catIcon(c){for(var i=0;i<XC.length;i++)if(XC[i][0]===c)return XC[i][1];return"•"}
@@ -462,7 +470,7 @@ function renderTrip(){
  var sy=FB.user?("☁️ Tersinkron ke cloud sebagai "+(FB.user.displayName||FB.user.email||"")+(FB.when?" · terakhir "+new Date(FB.when).toLocaleString("id-ID"):"")):"📱 Tersimpan di perangkat ini. Masuk (panel atas) agar sinkron antar perangkat.";
  $("tsync").textContent=ready?sy:"Memuat data..."}
 function addExp(){
- var v=parseFloat($("xa").value),r=parseFloat($("rate").value)||0,code=($("cur").value||"").toUpperCase()||"LOKAL";
+ var v=parseMoney($("xa").value),r=parseFloat($("rate").value)||0,code=($("cur").value||"").toUpperCase()||"LOKAL";
  if(!(v>0)){xmsg("Isi jumlah lebih dari 0.");return}
  if(xcur==="loc"&&!(r>0)){xmsg("Isi kurs di tab Rencana dulu.");return}
  var now=Date.now(),e={d:+$("xd").value||curDay,a:Math.round(xcur==="loc"?v*r:v),c:xcat,n:$("xn").value.trim().slice(0,60),cc:xcur==="loc"?code:"IDR",oa:v,t:now},id="e"+now+Math.random().toString(36).slice(2,6);
@@ -482,7 +490,7 @@ function csvText(){
 function snapshot(){var o={f:{},cities:cities,dF:dF,dA:dA,dAn:dAn,style:style,mult:mult,bpm:bpm};
  document.querySelectorAll("#pv [id]").forEach(function(el){if(el.tagName==="INPUT"||el.tagName==="SELECT")o.f[el.id]=el.type==="checkbox"?el.checked:el.value});return o}
 function restore(o){restoring=true;
- for(var k in o.f){var el=$(k);if(!el)continue;if(el.type==="checkbox")el.checked=!!o.f[k];else el.value=o.f[k]}
+  for(var k in o.f){var el=$(k);if(!el)continue;if(el.type==="checkbox")el.checked=!!o.f[k];else el.value=o.f[k]}fmtAllMoney();
  cities=o.cities||[];dF=o.dF||[];dA=o.dA||[];dAn=o.dAn||[];style=o.style||"b";mult=o.mult||1;bpm=!!o.bpm;
  $("cpc").disabled=$("cp").value!=="c";$("days").disabled=!$("man").checked;
  drawC();lastN=-1;lockMulti();paint();calc();restoring=false}
