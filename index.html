@@ -479,7 +479,7 @@ function fbStart(){
  ref.get().then(function(doc){
   var d=doc.exists?doc.data():null;
   if(d&&(d.updated_at||d.plan||d.exp)){fbApply(d,d.updated_at||0);}
-  else{$("ghmsg").textContent="Data cloud kosong. Mengunggah data perangkat ini...";fbPush();}
+  else{$("ghmsg").textContent="Data cloud kosong. Mengunggah data perangkat ini...";fbPush(true);}
   fbSubscribe();
  }).catch(function(e){$("ghmsg").textContent="Gagal memuat data: "+e.message;fbSubscribe();});}
 function fbSubscribe(){
@@ -498,15 +498,16 @@ function fbApply(d,remote){
  lastJ=JSON.stringify(snapshot());ready=true;renderTrip();
  FB.applying=false;FB.when=Date.now();
  $("ghmsg").textContent="⬇️ Data ditarik ("+new Date(remote).toLocaleString("id-ID")+")";}
-function fbPush(){
+function fbPush(imm){
  if(!FB.user||!FB.db)return;
  clearTimeout(FB.pushT);
- FB.pushT=setTimeout(function(){
+ var go=function(){
   if(!FB.user)return;
-  var now=Date.now();lsSet("bp_updated",now);
+  var now=Date.now();$("ghmsg").textContent="Mengunggah ke cloud...";
   FB.db.collection("budgets").doc(FB.user.uid).set({app:"backpackcalculatorali",updated_at:now,plan:snapshot(),exp:EXP})
-   .then(function(){FB.when=now;$("ghmsg").textContent="☁️ Tersinkron "+new Date(now).toLocaleTimeString("id-ID")})
-   .catch(function(e){$("ghmsg").textContent="Gagal sinkron: "+e.message;});},1200);}
+   .then(function(){lsSet("bp_updated",now);FB.when=now;$("ghmsg").textContent="☁️ Tersinkron "+new Date(now).toLocaleTimeString("id-ID")})
+   .catch(function(e){$("ghmsg").textContent="Gagal sinkron: "+((e&&e.message)||e)});};
+ if(imm)go();else FB.pushT=setTimeout(go,1200);}
 function scheduleCloud(){fbPush();}
 function fbGoogle(){$("ghmsg").textContent="Membuka Google...";FB.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){$("ghmsg").textContent=fbErr(e)});}
 function fbEmail(){var em=$("femail").value.trim(),pw=$("fpass").value;if(!em||!pw){$("ghmsg").textContent="Isi email & password dulu.";return}$("ghmsg").textContent="Masuk...";FB.auth.signInWithEmailAndPassword(em,pw).then(function(){$("fpass").value=""}).catch(function(e){$("ghmsg").textContent=fbErr(e)});}
