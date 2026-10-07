@@ -73,11 +73,7 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 </div>
 <div id="ghloginbox" style="margin-top:10px">
 <button class="btn pri" id="fbgoogle" type="button" style="width:100%">🔵 Masuk dengan Google</button>
-<div class="hint" style="text-align:center;margin:10px 0">— atau dengan email —</div>
-<div><label for="femail">Email</label><input id="femail" type="email" placeholder="nama@email.com" autocomplete="email"></div>
-<div style="margin-top:8px"><label for="fpass">Password</label><input id="fpass" type="password" placeholder="min. 6 karakter" autocomplete="current-password"></div>
-<div class="top" style="margin:8px 0 0"><button class="btn pri" id="fblogin" type="button">Masuk</button><button class="btn" id="fbsignup" type="button">Daftar baru</button></div>
-<p class="hint">Data disimpan di database Firebase-mu dan hanya bisa diakses oleh akunmu. Tanpa login, data tetap tersimpan di perangkat ini saja.</p>
+<p class="hint" style="margin-top:8px">Data disimpan di database Firebase-mu dan hanya bisa diakses oleh akunmu. Tanpa login, data tetap tersimpan di perangkat ini saja.</p>
 </div>
 </section>
 <div id="pv"><div class="top"><button class="btn pri" id="bpm" aria-pressed="false">🎒 Backpacker Mode</button><button class="btn" id="reset">Reset</button></div>
@@ -518,8 +514,6 @@ function fbPush(imm){
  if(imm)go();else FB.pushT=setTimeout(go,1200);}
 function scheduleCloud(){fbPush();}
 function fbGoogle(){$("ghmsg").textContent="Membuka Google...";FB.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){$("ghmsg").textContent=fbErr(e)});}
-function fbEmail(){var em=$("femail").value.trim(),pw=$("fpass").value;if(!em||!pw){$("ghmsg").textContent="Isi email & password dulu.";return}$("ghmsg").textContent="Masuk...";FB.auth.signInWithEmailAndPassword(em,pw).then(function(){$("fpass").value=""}).catch(function(e){$("ghmsg").textContent=fbErr(e)});}
-function fbSignup(){var em=$("femail").value.trim(),pw=$("fpass").value;if(!em||pw.length<6){$("ghmsg").textContent="Isi email & password minimal 6 karakter.";return}$("ghmsg").textContent="Membuat akun...";FB.auth.createUserWithEmailAndPassword(em,pw).then(function(){$("fpass").value=""}).catch(function(e){$("ghmsg").textContent=fbErr(e)});}
 function fbLogout(){if(FB.auth)FB.auth.signOut();}
 function fbInit(){
  if(!FB.auth){$("ghmsg").textContent="Firebase gagal dimuat. Cek koneksi lalu muat ulang.";return;}
@@ -543,9 +537,6 @@ $("xcp").onclick=function(){var t=tripText();if(!t){$("xm2").textContent="Belum 
 $("xcsv").onclick=function(){if(!EXP.length){$("xm2").textContent="Belum ada pengeluaran untuk diunduh.";return}save("pengeluaran-trip.csv",csvText(),$("xm2"))};
 $("fblogout").onclick=fbLogout;
 $("fbgoogle").onclick=fbGoogle;
-$("fblogin").onclick=fbEmail;
-$("fbsignup").onclick=fbSignup;
-$("fpass").addEventListener("keydown",function(e){if(e.key==="Enter")fbEmail()});
 buildCountryList();reset();buildCityList($("country").value);autoRate($("cur").value);initStore();
 })();
 </script></body></html>
