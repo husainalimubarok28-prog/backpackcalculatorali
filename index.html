@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Backpacking Budget Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2ee;--pn:#fbfcfa;--ink:#16302a;--mu:#5d6f69;--ln:#d3ddd7;--ac:#e0a526;--g:#16453b;--bad:#b5372a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b18;--pn:#172723;--ink:#e6efe9;--mu:#93a69e;--ln:#2a403a;--bad:#ef8a7c}}
+:root[data-theme="dark"]{--bg:#0f1b18;--pn:#172723;--ink:#e6efe9;--mu:#93a69e;--ln:#2a403a;--bad:#ef8a7c}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "DM Sans",system-ui,sans-serif;padding-bottom:84px}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px}
+h1{font:800 clamp(28px,6vw,46px)/1.05 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 6px;letter-spacing:-.02em}
+h2{font:700 17px "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 10px}
+.sub{color:var(--mu);margin:0 0 14px}.top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.pn,details{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+summary{font:700 17px "Bricolage Grotesque",system-ui,sans-serif;cursor:pointer;min-height:32px;list-style-position:inside}
+details[open] summary{margin-bottom:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}.g2 .full{grid-column:1/-1}
+@media(max-width:420px){.g2{grid-template-columns:1fr}}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 3px}
+input,select{width:100%;font:500 16px "DM Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:9px 10px;min-height:44px}
+input:disabled{opacity:.45}input[type=checkbox]{width:20px;min-height:20px;height:20px;vertical-align:middle;margin-right:8px}
+.chk{display:flex;align-items:center;margin-top:10px;font-size:15px;color:var(--ink)}
+:is(input,select,button,summary):focus-visible{outline:3px solid #2f7a8f;outline-offset:1px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ln);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-left:1px solid var(--ln);background:var(--bg);color:var(--ink);font:500 14px "DM Sans",sans-serif;padding:10px 2px;min-height:44px;cursor:pointer}
+.seg button:first-child{border-left:0}.seg button[aria-pressed=true]{background:var(--g);color:#fff}
+.hint{font-size:12.5px;color:var(--mu);margin:6px 0 0}
+.btn{border:1px solid var(--ln);background:var(--pn);color:var(--ink);font:500 15px "DM Sans",sans-serif;border-radius:8px;padding:9px 14px;min-height:44px;cursor:pointer}
+.btn.pri{background:var(--ac);border-color:var(--ac);color:#2b1f00;font-weight:700}.btn[aria-pressed=true]{background:var(--g);border-color:var(--g);color:#fff}
+.btn.sm{min-height:44px;padding:6px 12px}
+.city{border:1px solid var(--ln);border-radius:10px;padding:10px;margin-bottom:10px}
+.city .r{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.city .n{display:grid;grid-template-columns:1fr auto;gap:8px}
+@media(max-width:520px){.city .r{grid-template-columns:1fr 1fr}}
+.tot{background:var(--g);color:#fff;border-radius:14px;padding:18px;margin-bottom:12px}
+.tot .big{font:800 clamp(30px,7vw,44px)/1.05 "Bricolage Grotesque",sans-serif;margin:2px 0 4px;overflow-wrap:anywhere}
+.tot .s{font-size:14px;opacity:.88}.st{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.st div{border-top:1px solid rgba(255,255,255,.28);padding-top:6px;font-size:12.5px}.st b{display:block;font:700 16px "Bricolage Grotesque",sans-serif;overflow-wrap:anywhere}
+.badge{display:inline-block;font:700 16px "Bricolage Grotesque",sans-serif;padding:6px 12px;border-radius:999px;background:var(--bg);border:1px solid var(--ln)}
+.warn{background:#fff3cd;color:#5c4400;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.warn:empty{display:none}
+.bk{display:flex;gap:16px;align-items:center}.donut{width:132px;height:132px;border-radius:50%;flex:none;display:grid;place-items:center}
+.donut i{width:84px;height:84px;border-radius:50%;background:var(--pn);display:grid;place-items:center;font:700 13px "DM Sans";font-style:normal;color:var(--mu);text-align:center}
+@media(max-width:420px){.bk{flex-direction:column;align-items:stretch}.donut{align-self:center}}
+ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bottom:1px solid var(--ln);font-size:14.5px}.lg li:last-child{border:0}
+.lg .t{display:flex;gap:8px;align-items:center}.lg .t span:nth-child(2){flex:1}.pb{height:6px;border-radius:3px;background:var(--ln);margin-top:4px;overflow:hidden}.pb i{display:block;height:100%}
+.top1{font-size:11px;background:var(--ac);color:#2b1f00;border-radius:4px;padding:1px 6px;font-weight:700}
+.dl{max-height:300px;overflow:auto}.dl li{display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;padding:5px 0;font-size:14px}
+.dl .b{height:8px;background:var(--ln);border-radius:4px;overflow:hidden}.dl .b i{display:block;height:100%;background:#2f7a8f}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.cmp>div{border:1px solid var(--ln);border-radius:10px;padding:10px;font-size:14px}.cmp b{display:block;font:700 18px "Bricolage Grotesque",sans-serif}
+.tw{overflow-x:auto;margin-top:10px}table{border-collapse:collapse;width:100%;font-size:13px;min-width:600px}th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:var(--mu);font-weight:500}tfoot td{font-weight:700}tfoot tr:first-child td{border-top:2px solid var(--ink)}
+@media print{body *{visibility:hidden}#rep,#rep *{visibility:visible}#rep{position:absolute;left:0;top:0;width:100%;border:0}#rep .top{display:none}.tw{overflow:visible}table{min-width:0}body{background:#fff;color:#000;padding:0}}
+.dr{border:1px solid var(--ln);border-radius:10px;padding:8px 10px;margin-top:8px}.dr label{margin:4px 0 2px}.r4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:520px){.r4{grid-template-columns:1fr 1fr}}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.chips button{border:1px solid var(--ln);background:var(--bg);color:var(--ink);font:500 15px "DM Sans",sans-serif;border-radius:8px;min-height:48px;cursor:pointer}.chips button[aria-pressed=true]{background:var(--g);border-color:var(--g);color:#fff}
+#xa{font:700 26px "Bricolage Grotesque",sans-serif;min-height:58px}
+.xi{display:grid;grid-template-columns:26px 1fr auto 44px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--ln);font-size:15px}.xi small{display:block;color:var(--mu);font-size:12px}.xi .btn{padding:0;min-width:44px}
+.win{outline:2px solid var(--ac)}
+.mbar{position:fixed;left:0;right:0;bottom:0;background:var(--g);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;z-index:5}
+.mbar b{font:800 20px "Bricolage Grotesque",sans-serif}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<div class="wrap">
+<h1>Backpacking Budget Calculator</h1>
+<p class="sub">Isi rencana perjalananmu, hasilnya langsung berubah. Semua hitungan jalan di browser, tanpa login.</p>
+<div class="seg" id="tabs" style="grid-template-columns:1fr 1fr;margin-bottom:16px"><button data-v="p" aria-pressed="true">📊 Rencana</button><button data-v="t" aria-pressed="false">🧾 Catat Trip</button></div>
+<div id="pv"><div class="top"><button class="btn pri" id="bpm" aria-pressed="false">🎒 Backpacker Mode</button><button class="btn" id="reset">Reset</button></div>
+<div class="grid"><div id="in">
+
+<details open><summary>🧭 Perjalanan</summary><div class="g2">
+<div><label for="country">Negara tujuan</label><input id="country" list="cl" data-l="Negara"><datalist id="cl"><option>Thailand</option><option>Malaysia</option><option>Vietnam</option><option>Singapura</option><option>Jepang</option><option>Filipina</option><option>Korea Selatan</option></datalist></div>
+<div><label for="city">Kota tujuan</label><input id="city" data-l="Kota"></div>
+<div><label for="start">Tanggal mulai</label><input id="start" type="date"></div>
+<div><label for="end">Tanggal selesai</label><input id="end" type="date"></div>
+<div class="full chk"><input type="checkbox" id="man"><label for="man" style="margin:0;color:var(--ink)">Isi jumlah hari manual</label></div>
+<div><label for="days">Jumlah hari</label><input id="days" type="number" min="0" inputmode="numeric" data-l="Jumlah hari"></div>
+<div><label for="people">Jumlah orang</label><input id="people" type="number" min="1" inputmode="numeric" data-l="Jumlah orang"></div>
+<div><label for="cur">Mata uang lokal (kode)</label><input id="cur" maxlength="4" data-l="Mata uang"></div>
+<div><label for="rate" id="rl">Kurs: 1 THB = Rp</label><input id="rate" type="number" min="0" step="any" inputmode="decimal" data-l="Kurs"></div>
+</div><p class="hint">Kurs diisi sendiri, tidak diambil real-time. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p></details>
+
+<details open><summary>🎚️ Gaya perjalanan</summary>
+<div class="seg" id="seg"><button data-s="h">Hemat</button><button data-s="b">Backpacker</button><button data-s="n">Nyaman</button><button data-s="c">Custom</button></div>
+<p class="hint" id="sh"></p></details>
+
+<div id="secs"></div>
+
+<details><summary>🗺️ Multi-kota</summary>
+<div class="chk"><input type="checkbox" id="multi"><label for="multi" style="margin:0;color:var(--ink)">Aktifkan multi-kota</label></div>
+<div id="mb" hidden><p class="hint">Penginapan, makan, dan transport lokal mengikuti tiap kota. Tiket pesawat, bus/kereta/ferry, dokumen, dan lainnya tetap di bagian masing-masing.</p><div id="cities"></div><button class="btn" id="addc">+ Tambah kota</button></div></details>
+
+<details open><summary>🛡️ Dana darurat</summary><div class="g2">
+<div><label for="cp">Persentase dari subtotal</label><select id="cp"><option value="5">5%</option><option value="10" selected>10%</option><option value="15">15%</option><option value="20">20%</option><option value="c">Custom</option></select></div>
+<div><label for="cpc">Custom (%)</label><input id="cpc" type="number" min="0" max="100" inputmode="decimal" value="10" disabled data-l="Dana darurat"></div></div></details>
+</div>
+
+<aside id="out">
+<div class="warn" id="warn" role="alert"></div>
+<section class="tot" aria-live="polite"><div class="s">Total budget</div><div class="big" id="T"></div><div class="s" id="Td"></div>
+<div class="st"><div>Per orang<b id="pp"></b></div><div>Per hari<b id="pd"></b></div><div>Per orang per hari<b id="ppd"></b></div></div>
+<div class="s" id="loc" style="margin-top:12px"></div></section>
+<section class="pn"><h2>Seberapa hemat?</h2><span class="badge" id="bd"></span><p class="hint" id="bh"></p></section>
+<section class="pn"><h2>Ke mana uangnya pergi</h2><div class="bk"><div class="donut" id="dn"><i id="dc"></i></div><ul class="lg" id="lg"></ul></div></section>
+<section class="pn"><h2>Budget harian</h2><p class="hint" style="margin:0 0 6px">Tiket pergi, visa, dan biaya sekali bayar masuk di hari 1. Tiket pulang di hari terakhir. Tanpa dana darurat.</p><ul class="dl" id="dl"></ul></section>
+<section class="pn" id="rep"><h2>Laporan perjalanan</h2><div id="rs"></div><div class="tw"><table id="rt"></table></div>
+<div class="top" style="margin:12px 0 0"><button class="btn pri" id="cpy">Salin laporan</button><button class="btn" id="pdf">Simpan PDF</button></div><p class="hint" id="cm" role="status"></p><textarea id="cbox" hidden readonly rows="8" aria-label="Teks laporan" style="width:100%;margin-top:8px;font:13px/1.4 monospace;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:8px"></textarea></section>
+<section class="pn"><h2>Bandingkan 2 budget</h2>
+<div class="g2"><div><label for="na">Nama rute A</label><input id="na" value="Rute A" data-l="Nama A"></div><div><label for="nb">Nama rute B</label><input id="nb" value="Rute B" data-l="Nama B"></div></div>
+<p class="hint">Atur kalkulator untuk satu rute, lalu simpan. Ubah isiannya untuk rute lain, lalu simpan ke slot berikutnya.</p>
+<div class="top" style="margin:8px 0 0"><button class="btn" id="sa">Simpan sebagai A</button><button class="btn" id="sb">Simpan sebagai B</button></div>
+<div id="cmp"></div></section>
+</aside></div></div>
+<div id="tv" hidden>
+<p class="hint" id="tsync" style="margin:0 0 10px"></p>
+<section class="tot" aria-live="polite"><div class="s">Sisa budget di lokasi</div><div class="big" id="tsisa"></div><div class="s" id="tsub"></div>
+<div class="pb" style="margin-top:10px;background:rgba(255,255,255,.25)"><i id="tbar" style="background:var(--ac)"></i></div>
+<div class="st"><div>Terpakai<b id="tsp"></b></div><div>Budget lokasi<b id="tbd"></b></div><div>Jatah hari ini<b id="tal"></b></div></div></section>
+<section class="pn"><h2>Catat pengeluaran</h2>
+<label for="xa">Jumlah</label><input id="xa" type="number" min="0" step="any" inputmode="decimal" placeholder="0" autocomplete="off">
+<label>Mata uang</label><div class="seg" id="xcur" style="grid-template-columns:1fr 1fr"><button data-xcur="idr" aria-pressed="true">Rp</button><button data-xcur="loc" aria-pressed="false" id="xcl">Lokal</button></div>
+<p class="hint" id="xp"></p>
+<label>Kategori</label><div class="chips" id="xcat"></div>
+<div class="g2"><div><label for="xn">Catatan</label><input id="xn" maxlength="60" placeholder="mis. pad thai" autocomplete="off"></div><div><label for="xd">Hari ke</label><select id="xd"></select></div></div>
+<button class="btn pri" id="xadd" style="width:100%;margin-top:14px;min-height:52px;font-size:17px">+ Tambah pengeluaran</button><p class="hint" id="xm" role="status"></p></section>
+<section class="pn"><h2 id="xtt">Hari ini</h2><div id="xtd"></div></section>
+<section class="pn"><h2>Riwayat per hari</h2><div id="xl"></div></section>
+<section class="pn"><h2>Rekap per kategori</h2><ul class="lg" id="xr"></ul></section>
+<div class="top"><button class="btn" id="xcp">Salin rekap</button><button class="btn" id="xcsv">Unduh CSV</button></div><p class="hint" id="xm2" role="status"></p>
+<textarea id="xbox" hidden readonly rows="8" aria-label="Teks rekap" style="width:100%;font:13px/1.4 monospace;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:8px"></textarea>
+</div></div>
+<div class="mbar"><span>Total<br><b id="mt"></b></span><span style="text-align:right">Per orang<br><b id="mp"></b></span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var rp=function(n){return "Rp"+Math.round(isFinite(n)?n:0).toLocaleString("id-ID")};
+var F=[["✈️ Transportasi",[["fly1","Tiket pesawat pergi",1000000],["fly2","Tiket pesawat pulang",1000000],["bus","Bus (total)",0],["train","Kereta (total)",0],["ferry","Ferry (total)",0],["local","Transportasi lokal / hari",50000,1],["apt","Airport transfer (total)",0]]],
+["🏠 Akomodasi",[["stay","Harga penginapan / malam (per kamar)",150000,1],["room","Orang per kamar",1],["nights","Jumlah malam (kosong = hari − 1)",""]]],
+["🍜 Makanan",[["bf","Sarapan / hari",20000,1],["lunch","Makan siang / hari",35000,1],["dinner","Makan malam / hari",35000,1],["snack","Snack / kopi / hari",10000,1]]],
+["🎟️ Aktivitas",[["tix","Tiket wisata (total)",300000,1],["tour","Tour (total)",0],["actx","Aktivitas lainnya (total)",0]]],
+["🛂 Dokumen & perjalanan",[["visa","Visa",0],["ins","Asuransi",0],["pass","Paspor / dokumen",0],["sim","SIM card / eSIM",100000]]],
+["🛍️ Lain-lain",[["laundry","Laundry (total)",0],["shop","Belanja (total)",0],["souv","Souvenir (total)",0],["unexp","Biaya tak terduga (total)",0]]]];
+var DEF={},BASE={},h="";
+var EX={2:'<div class="chk"><input type="checkbox" id="fpd"><label for="fpd" style="margin:0;color:var(--ink)">Catat makan per hari</label></div><p class="hint">Satu baris untuk tiap hari perjalanan. Isian makan di atas dinonaktifkan.</p><div id="fdays"></div>',3:'<div class="chk"><input type="checkbox" id="apd"><label for="apd" style="margin:0;color:var(--ink)">Catat aktivitas per hari</label></div><p class="hint">Satu baris untuk tiap hari perjalanan. Isian aktivitas di atas dinonaktifkan.</p><div id="adays"></div>'};
+F.forEach(function(s,si){h+='<details><summary>'+s[0]+'</summary><div class="g2">';
+ s[1].forEach(function(f){DEF[f[0]]=f[2];if(f[3])BASE[f[0]]=f[2];
+  h+='<div><label for="'+f[0]+'">'+f[1]+'</label><input id="'+f[0]+'" type="number" min="0" step="any" inputmode="decimal" data-l="'+f[1].replace(/ \(.*|\s\/.*/,"")+'"'+(f[3]?' data-cost':'')+'"></div>'});
+ h+='</div>'+(EX[si]||'')+'</details>'});
+$("secs").innerHTML=h;
+var LM=null,EXP=[],curDay=1,dayInit=false,xcat="mk",xcur="idr",ready=false,restoring=false,lastJ="",saveT=0,dF=[],dA=[],dAn=[],lastN=-1,REP="",RPT=null,cities=[],style="b",mult=1,bpm=false,A=null,B=null,warns={};
+var CUR={Thailand:"THB",Malaysia:"MYR",Vietnam:"VND",Singapura:"SGD",Jepang:"JPY",Filipina:"PHP","Korea Selatan":"KRW"};
+var CAT=[["tr","✈️","Transportasi","#16453b"],["st","🏠","Akomodasi","#2f7a8f"],["fo","🍜","Makanan","#e0a526"],["ac","🎟️","Aktivitas","#b5573a"],["dc","🛂","Dokumen","#7a8c5a"],["ms","🛍️","Lain-lain","#9b6b9e"],["eg","🛡️","Dana darurat","#8a8fa3"]];
+function N(id){var r=parseFloat($(id).value);if(r<0){warns[$(id).dataset.l+" tidak boleh negatif, dihitung 0"]=1;return 0}return isFinite(r)?r:0}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function r5(x){return Math.round(x/5000)*5000}
+function daysCalc(){
+ if($("man").checked)return Math.round(N("days"));
+ var s=new Date($("start").value),e=new Date($("end").value);
+ if(isNaN(s)||isNaN(e)){warns["Isi tanggal mulai dan selesai, atau pilih jumlah hari manual"]=1;return 0}
+ if(e<s){warns["Tanggal selesai harus setelah tanggal mulai"]=1;return 0}
+ return Math.round((e-s)/864e5)+1}
+function model(){
+ warns={};
+ var ppl=Math.max(1,Math.round(N("people"))||1),multi=$("multi").checked;
+ var fs=N("bf")+N("lunch")+N("dinner")+N("snack"),rooms=Math.ceil(ppl/Math.max(1,Math.round(N("room"))||1));
+ var days=daysCalc(),cs;
+ if(multi){cs=cities.map(function(c){return{d:Math.max(0,Math.round(c.d)||0),stay:c.stay,food:c.food,local:c.local,act:c.act}});days=cs.reduce(function(s,c){return s+c.d},0)}
+ else cs=[{d:days,stay:N("stay"),food:fs,local:N("local"),act:0}];
+ if(!$("man").checked&&!multi)$("days").value=days;
+ if(days<1)warns["Jumlah hari belum diisi, hasil masih Rp0"]=1;
+ var L=days,D=[],i;for(i=0;i<L;i++)D.push({tr:0,lo:0,st:0,fo:0,ac:0,dc:0,ms:0});
+ var nsing=$("nights").value===""?Math.max(0,days-1):Math.round(N("nights")),idx=0;
+ cs.forEach(function(c,ci){
+  var ns=multi?(ci===cs.length-1?Math.max(0,c.d-1):c.d):Math.min(c.d,nsing);
+  for(var k=0;k<c.d;k++){var d=D[idx+k];if(k<ns)d.st+=c.stay*rooms;d.fo+=c.food*ppl;d.lo+=c.local*ppl;d.ac+=c.act*ppl/c.d}
+  idx+=c.d});
+ if($("fpd").checked)D.forEach(function(d,i){var r=dF[i]||[0,0,0,0];d.fo=(r[0]+r[1]+r[2]+r[3])*ppl});
+ if($("apd").checked)D.forEach(function(d,i){d.ac=(dA[i]||0)*ppl});
+ if(L>0){
+  D[0].tr+=(N("fly1")+N("apt"))*ppl;D[L-1].tr+=N("fly2")*ppl;
+  var ic=(N("bus")+N("train")+N("ferry"))*ppl;
+  if(multi&&cs.length>1){var p=0;cs.forEach(function(c,ci){if(ci>0&&D[p])D[p].tr+=ic/(cs.length-1);p+=c.d})}else D[Math.floor(L/2)].tr+=ic;
+  D[0].dc+=(N("visa")+N("ins")+N("pass")+N("sim"))*ppl;
+  var ac=$("apd").checked?0:(N("tix")+N("tour")+N("actx"))*ppl,ms=(N("laundry")+N("shop")+N("souv")+N("unexp"))*ppl;
+  D.forEach(function(d){d.ac+=ac/L;d.ms+=ms/L})}
+ var t={tr:0,st:0,fo:0,ac:0,dc:0,ms:0,lo:0};
+ D.forEach(function(d){for(var k in t)t[k]+=d[k]});
+ t.tr+=t.lo;var sub=t.tr+t.st+t.fo+t.ac+t.dc+t.ms;
+ var pc=$("cp").value==="c"?Math.min(100,N("cpc")):+$("cp").value;
+ t.eg=sub*pc/100;
+ var dd=Math.max(days,1),total=sub+t.eg;
+ return{ppl:ppl,days:days,D:D,t:t,sub:sub,total:total,pp:total/ppl,pd:total/dd,ppd:total/ppl/dd,daily:(t.st+t.fo+t.lo+t.ac)/ppl/dd,pre:(N("fly1")+N("fly2")+N("visa")+N("ins")+N("pass")+N("sim"))*ppl,fly:(N("fly1")+N("fly2"))*ppl}}
+function calc(){
+ if($("fpd").checked||$("apd").checked)syncDays();
+ var m=model(),code=($("cur").value||"").toUpperCase();
+ $("rl").textContent="Kurs: 1 "+(code||"mata uang lokal")+" = Rp";
+ $("T").textContent=rp(m.total);$("Td").textContent="Perjalanan "+rp(m.sub)+" + dana darurat "+rp(m.t.eg)+" · "+m.ppl+" orang, "+m.days+" hari";
+ $("pp").textContent=rp(m.pp);$("pd").textContent=rp(m.pd);$("ppd").textContent=rp(m.ppd);
+ $("mt").textContent=rp(m.total);$("mp").textContent=rp(m.pp);
+ var rate=N("rate");
+ $("loc").textContent=rate>0?"≈ "+(code||"")+" "+Math.round(m.total/rate).toLocaleString("id-ID")+" ("+(code||"lokal")+" "+Math.round(m.pp/rate).toLocaleString("id-ID")+" per orang)":"Isi kurs untuk melihat total dalam mata uang lokal";
+ var S={h:["🟢 HEMAT"],b:["🟡 BACKPACKER"],n:["🟠 NYAMAN"]},bd,bh;
+ if(style!=="c"){bd=S[style][0];bh="Berdasarkan gaya perjalanan yang kamu pilih."}
+ else{var r=m.daily/343000;bd=r<=.45?"🟢 SUPER HEMAT":r<=.8?"🟢 HEMAT":r<=1.3?"🟡 BACKPACKER":r<=2.2?"🟠 NYAMAN":"🔴 PREMIUM";
+  bh="Gaya Custom dinilai dari biaya harianmu ("+rp(m.daily)+" per orang) dibanding patokan gaya Backpacker bawaan, bukan angka global."}
+ $("bd").textContent=bd;$("bh").textContent=bh;
+ var tot=m.total||1,acc=0,g=[],mx=0;CAT.forEach(function(c){mx=Math.max(mx,m.t[c[0]])});
+ var lg="";CAT.forEach(function(c){var v=m.t[c[0]],p=v/tot*100;g.push(c[3]+" "+acc+"% "+(acc+p)+"%");acc+=p;
+  lg+='<li><div class="t"><span>'+c[1]+'</span><span>'+c[2]+(v>0&&v===mx?' <span class="top1">terbesar</span>':'')+'</span><b>'+rp(v)+'</b></div><div class="pb" title="'+Math.round(p)+'%"><i style="width:'+p+'%;background:'+c[3]+'"></i></div></li>'});
+ $("lg").innerHTML=lg;$("dn").style.background=m.total>0?"conic-gradient("+g.join(",")+")":"var(--ln)";$("dc").textContent=m.total>0?"Rp"+Math.round(m.pd/1000)+"rb/hari":"-";
+ var mxd=0;m.D.forEach(function(d){mxd=Math.max(mxd,d.tr+d.lo+d.st+d.fo+d.ac+d.dc+d.ms)});
+ $("dl").innerHTML=m.D.map(function(d,i){var v=d.tr+d.lo+d.st+d.fo+d.ac+d.dc+d.ms;return'<li><span>Hari '+(i+1)+'</span><span class="b"><i style="width:'+(mxd?v/mxd*100:0)+'%"></i></span><b>'+rp(v)+'</b></li>'}).join("")||'<li style="display:block;color:var(--mu)">Isi jumlah hari untuk melihat simulasi.</li>';
+ var cols=[["tr","✈️ Transport"],["st","🏠 Inap"],["fo","🍜 Makan"],["ac","🎟️ Aktivitas"],["dc","🛂 Dokumen"],["ms","🛍️ Lain"]];
+ var R=m.D.map(function(d){var o={tr:d.tr+d.lo,st:d.st,fo:d.fo,ac:d.ac,dc:d.dc,ms:d.ms};o.t=o.tr+o.st+o.fo+o.ac+o.dc+o.ms;return o});
+ var lines=[];
+ if(m.days>0){
+  var xi=0,ni=0;R.forEach(function(o,i){if(o.t>R[xi].t)xi=i;if(o.t<R[ni].t)ni=i});
+  var tp=CAT.slice(0,6).reduce(function(a,c){return m.t[c[0]]>m.t[a[0]]?c:a},CAT[0]);
+  lines=["Total yang dikeluarkan selama "+m.days+" hari: "+rp(m.total)+" (termasuk dana darurat "+rp(m.t.eg)+")",
+   "Rata-rata per hari: "+rp(m.sub/m.days)+" (tanpa dana darurat)",
+   "Hari termahal: Hari "+(xi+1)+" ("+rp(R[xi].t)+")","Hari termurah: Hari "+(ni+1)+" ("+rp(R[ni].t)+")",
+   "Pengeluaran terbesar: "+tp[2]+" ("+rp(m.t[tp[0]])+", "+Math.round(m.sub?m.t[tp[0]]/m.sub*100:0)+"% dari biaya perjalanan)",
+   "Per orang: "+rp(m.pp)+" untuk "+m.ppl+" orang"]}
+ $("rs").innerHTML=lines.length?'<ul class="lg">'+lines.map(function(l){return"<li>"+esc(l)+"</li>"}).join("")+"</ul>":'<p class="hint">Isi jumlah hari untuk melihat laporan.</p>';
+ $("rt").innerHTML=m.days>0?"<thead><tr><th>Hari</th>"+cols.map(function(c){return"<th>"+c[1]+"</th>"}).join("")+"<th>Total</th></tr></thead><tbody>"+R.map(function(o,i){return"<tr><td>Hari "+(i+1)+"</td>"+cols.map(function(c){return"<td>"+(o[c[0]]?rp(o[c[0]]):"-")+"</td>"}).join("")+"<td><b>"+rp(o.t)+"</b></td></tr>"}).join("")+"</tbody><tfoot><tr><td>Subtotal</td>"+cols.map(function(c){return"<td>"+rp(m.t[c[0]])+"</td>"}).join("")+"<td>"+rp(m.sub)+"</td></tr><tr><td colspan=\"7\">🛡️ Dana darurat</td><td>"+rp(m.t.eg)+"</td></tr><tr><td colspan=\"7\">TOTAL BUDGET</td><td>"+rp(m.total)+"</td></tr></tfoot>":"";
+ REP=m.days>0?"LAPORAN BUDGET BACKPACKING\n"+($("city").value||$("country").value||"Perjalanan")+" · "+m.days+" hari · "+m.ppl+" orang\n\n"+R.map(function(o,i){return"Hari "+(i+1)+": "+rp(o.t)+" (transport "+rp(o.tr)+", inap "+rp(o.st)+", makan "+rp(o.fo)+", aktivitas "+rp(o.ac)+(dAn[i]&&$("apd").checked?" ["+dAn[i]+"]":"")+(o.dc?", dokumen "+rp(o.dc):"")+(o.ms?", lain-lain "+rp(o.ms):"")+")"}).join("\n")+"\n\nRINGKASAN\n"+lines.join("\n"):"";
+ RPT=m.days>0?{sub:($("city").value||$("country").value||"Perjalanan")+" - "+m.days+" hari - "+m.ppl+" orang",lines:lines,R:R,t:m.t,subtotal:m.sub,total:m.total,notes:$("apd").checked?dAn.slice():[]}:null;
+ var w=Object.keys(warns);$("warn").innerHTML=w.map(esc).join("<br>");
+ $("sh").textContent={h:"Hostel/dorm, makan murah, transportasi umum, aktivitas gratis atau murah.",b:"Hostel/guesthouse, makan lokal, transportasi umum, beberapa aktivitas berbayar.",n:"Hotel budget, makan lebih fleksibel, transportasi nyaman, lebih banyak aktivitas.",c:"Atur sendiri setiap biaya di bagian bawah."}[style];
+ LM=m;renderTrip();if(ready&&!restoring)schedSave();cmp(m);return m}
+function cmp(m){
+ var o="";
+ function card(x,k){return'<div'+(x&&A&&B&&((k==="A")===(A.t<=B.t))?' class="win"':'')+'><span>'+esc(x?x.n:"Rute "+k)+'</span>'+(x?'<b>'+rp(x.t)+'</b>'+rp(x.p)+' / orang · '+x.d+' hari':'<span class="hint"> belum disimpan</span>')+'</div>'}
+ o='<div class="cmp">'+card(A,"A")+card(B,"B")+'</div>';
+ if(A&&B){var df=Math.abs(A.t-B.t);o+='<p class="hint" style="font-size:14px;color:var(--ink)">'+(df<1?"Kedua rute sama mahalnya.":esc(A.t<B.t?A.n:B.n)+" lebih murah "+rp(df)+".")+'</p>'}
+ $("cmp").innerHTML=o}
+function snap(k){var m=model();var x={n:$(k==="A"?"na":"nb").value||"Rute "+k,t:m.total,p:m.pp,d:m.days};if(k==="A")A=x;else B=x;calc()}
+function drawC(){$("cities").innerHTML=cities.map(function(c,i){
+ var f=[["d","Hari"],["stay","Inap/malam"],["food","Makan/hari"],["local","Lokal/hari"],["act","Aktivitas"]];
+ return'<div class="city"><div class="n"><input data-i="'+i+'" data-k="n" value="'+esc(c.n)+'" aria-label="Nama kota"><button class="btn sm" data-del="'+i+'" aria-label="Hapus kota">✕</button></div><div class="r">'+f.map(function(x){return'<div><label>'+x[1]+'</label><input type="number" min="0" inputmode="decimal" data-i="'+i+'" data-k="'+x[0]+'" value="'+c[x[0]]+'"></div>'}).join("")+'</div></div>'}).join("")}
+function lockFields(){var mu=$("multi").checked,f=$("fpd").checked,a=$("apd").checked;
+ ["stay","local"].forEach(function(i){$(i).disabled=mu});["bf","lunch","dinner","snack"].forEach(function(i){$(i).disabled=mu||f});["tix","tour","actx"].forEach(function(i){$(i).disabled=a})}
+function updF(){var t=0;dF.forEach(function(r,i){var x=r[0]+r[1]+r[2]+r[3];t+=x;var e=$("fs"+i);if(e)e.textContent="Total hari ini: "+rp(x)});var e=$("ft");if(e)e.textContent="Total makan semua hari: "+rp(t)+" per orang"}
+function updA(){var t=0;dA.forEach(function(x){t+=x});var e=$("at");if(e)e.textContent="Total aktivitas semua hari: "+rp(t)+" per orang"}
+function syncDays(){
+ var n=Math.max(0,Math.min(60,$("multi").checked?cities.reduce(function(s,c){return s+Math.max(0,Math.round(c.d)||0)},0):daysCalc()));
+ if(n===lastN)return;lastN=n;
+ var i,d0=[N("bf"),N("lunch"),N("dinner"),N("snack")],ap=Math.round((N("tix")+N("tour")+N("actx"))/Math.max(n,1));
+ dF=dF.slice(0,n);dA=dA.slice(0,n);dAn=dAn.slice(0,n);
+ for(i=0;i<n;i++){if(!dF[i])dF[i]=(dF[i-1]||d0).slice();if(dA[i]==null)dA[i]=ap;if(dAn[i]==null)dAn[i]=""}
+ var fh="",ah="";
+ if($("fpd").checked){for(i=0;i<n;i++)fh+='<div class="dr"><b>Hari '+(i+1)+'</b><div class="r4">'+["Sarapan","Siang","Malam","Snack"].map(function(l,j){return'<div><label>'+l+'</label><input type="number" min="0" inputmode="decimal" data-pd="f" data-i="'+i+'" data-j="'+j+'" value="'+dF[i][j]+'"></div>'}).join("")+'</div><span class="hint" id="fs'+i+'"></span></div>';fh+='<p class="hint" id="ft" style="font-weight:700;color:var(--ink)"></p>'}
+ if($("apd").checked){for(i=0;i<n;i++)ah+='<div class="dr"><b>Hari '+(i+1)+'</b><div class="r2"><div><label>Biaya aktivitas</label><input type="number" min="0" inputmode="decimal" data-pd="a" data-i="'+i+'" value="'+dA[i]+'"></div><div><label>Catatan</label><input maxlength="60" data-pd="n" data-i="'+i+'" value="'+esc(dAn[i])+'" placeholder="mis. tiket candi"></div></div></div>';ah+='<p class="hint" id="at" style="font-weight:700;color:var(--ink)"></p>'}
+ $("fdays").innerHTML=fh;$("adays").innerHTML=ah;updF();updA()}
+function lockMulti(){var on=$("multi").checked;$("mb").hidden=!on;lockFields();
+ if(on&&!cities.length){var fs=N("bf")+N("lunch")+N("dinner")+N("snack");cities=[{n:$("city").value||"Kota 1",d:Math.max(1,daysCalc()||3),stay:N("stay"),food:fs,local:N("local"),act:0}];drawC()}}
+function paint(){document.querySelectorAll("#seg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.s===style)});$("bpm").setAttribute("aria-pressed",bpm)}
+function setStyle(s){
+ if(s!=="c"){var m={h:.6,b:1,n:1.8}[s],old=mult;mult=m;
+  for(var k in BASE)$(k).value=r5(BASE[k]*m);
+  cities.forEach(function(c){["stay","food","local","act"].forEach(function(k){c[k]=r5(c[k]/old*m)})});drawC()}
+ style=s;paint()}
+function reset(){
+ for(var k in DEF)$(k).value=DEF[k];
+ $("country").value="Thailand";$("city").value="Bangkok";$("start").value="2026-11-20";$("end").value="2026-11-26";$("man").checked=false;$("people").value=1;$("cur").value="THB";$("rate").value=500;
+ $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];drawC();lockMulti();syncDays();
+ A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="b";paint();$("days").disabled=true;calc()}
+document.addEventListener("input",function(e){var t=e.target;
+ if(t.closest("#tv")){if(t.id==="xd"){curDay=+t.value||1;renderTrip()}else updPrev();return}
+ if(t.dataset.pd){var i=+t.dataset.i,v=Math.max(0,parseFloat(t.value)||0);
+  if(t.dataset.pd==="f")dF[i][+t.dataset.j]=v;else if(t.dataset.pd==="a")dA[i]=v;else dAn[i]=t.value;
+  updF();updA();calc();return}
+ if(t.id==="fpd"||t.id==="apd"){lastN=-1;lockFields();syncDays()}
+ if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:Math.max(0,parseFloat(t.value)||0)}
+ else if(t.hasAttribute("data-cost")){style="c";paint()}
+ if(t.id==="country"&&CUR[t.value])$("cur").value=CUR[t.value];
+ if(t.id==="cp")$("cpc").disabled=t.value!=="c";
+ if(t.id==="man")$("days").disabled=!t.checked;
+ if(t.id==="multi")lockMulti();
+ calc()});
+document.addEventListener("click",function(e){var t=e.target;
+ if(t.dataset.v)showView(t.dataset.v);
+ if(t.dataset.xcur){xcur=t.dataset.xcur;renderTrip();updPrev()}
+ if(t.dataset.xk){xcat=t.dataset.xk;renderTrip()}
+ if(t.dataset.xdel)delExp(t.dataset.xdel);
+ if(t.dataset.s){bpm=false;setStyle(t.dataset.s);calc()}
+ if(t.dataset.del!==undefined){cities.splice(+t.dataset.del,1);drawC();calc()}});
+$("addc").onclick=function(){var l=cities[cities.length-1]||{d:3,stay:150000,food:100000,local:50000,act:0};cities.push({n:"Kota "+(cities.length+1),d:3,stay:l.stay,food:l.food,local:l.local,act:0});drawC();calc()};
+$("bpm").onclick=function(){bpm=!bpm;if(bpm){setStyle("h");$("cp").value="10";$("cpc").disabled=true}else setStyle("b");calc()};
+function msg(t){$("cm").textContent=t}
+function copyText(txt,ta,out){
+ function say(t){out.textContent=t}
+ function manual(){ta.hidden=false;ta.value=txt;ta.focus();ta.select();say("Salin otomatis diblokir di tampilan ini. Teks sudah terpilih: tekan Ctrl+C, atau di HP tekan lama lalu pilih Salin.")}
+ function legacy(){try{ta.hidden=false;ta.value=txt;ta.focus();ta.select();ta.setSelectionRange(0,txt.length);var ok=document.execCommand("copy");if(ok){ta.hidden=true;say("Disalin.")}else manual()}catch(e){manual()}}
+ if(navigator.clipboard&&navigator.clipboard.writeText){try{navigator.clipboard.writeText(txt).then(function(){ta.hidden=true;say("Disalin.")},legacy)}catch(e){legacy()}}else legacy()}
+function save(name,data,out){
+ var say=function(t){(out||$("cm")).textContent=t};
+ try{
+  var type=/\.pdf$/i.test(name)?"application/pdf":/\.csv$/i.test(name)?"text/csv;charset=utf-8":/\.txt$/i.test(name)?"text/plain;charset=utf-8":"application/octet-stream";
+  var blob=data instanceof Blob?data:new Blob([data],{type:type});
+  var url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},1500);
+  say("File "+name+" diunduh.");
+ }catch(e){say("Unduhan gagal di browser ini. Pakai tombol Salin.")}}
+function pdf(){
+ var P=RPT;if(!P){msg("Belum ada laporan. Isi jumlah hari dulu.");return}
+ var J=window.jspdf&&window.jspdf.jsPDF;
+ if(!J){save("laporan-budget-backpacking.txt",REP);return}
+ var doc=new J({orientation:"landscape",unit:"mm",format:"a4"}),M=12,W=297,y=M+4;
+ var cw=[22,36,36,36,36,36,36,35],hd=["Hari","Transport","Inap","Makan","Aktivitas","Dokumen","Lain-lain","Total"],ks=["tr","st","fo","ac","dc","ms","t"];
+ function row(c,b,sh){if(y>192){doc.addPage();y=M+4;th()}
+  doc.setFont("helvetica",b?"bold":"normal");doc.setFontSize(9);
+  if(sh){doc.setFillColor(230,236,232);doc.rect(M,y-4.6,W-2*M,6.6,"F")}
+  var x=M;c.forEach(function(v,i){if(i===0)doc.text(String(v),x+1.5,y);else doc.text(String(v),x+cw[i]-1.5,y,{align:"right"});x+=cw[i]});y+=6.6}
+ function th(){row(hd,true,true)}
+ doc.setFont("helvetica","bold");doc.setFontSize(17);doc.text("Laporan Budget Backpacking",M,y);y+=7;
+ doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text(P.sub,M,y);y+=8;
+ doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Ringkasan",M,y);y+=6;
+ doc.setFont("helvetica","normal");doc.setFontSize(10);
+ P.lines.forEach(function(l){doc.splitTextToSize(l,W-2*M).forEach(function(t){doc.text(t,M,y);y+=5.2})});y+=4;
+ th();
+ P.R.forEach(function(o,i){row(["Hari "+(i+1)].concat(ks.map(function(k){return o[k]?rp(o[k]):"-"})),false,false)});
+ row(["Subtotal"].concat(ks.slice(0,6).map(function(k){return rp(P.t[k])}),[rp(P.subtotal)]),true,true);
+ row(["Dana darurat","","","","","","",rp(P.t.eg)],false,false);
+ row(["TOTAL BUDGET","","","","","","",rp(P.total)],true,true);
+ var nt=[];P.notes.forEach(function(n,i){if(n)nt.push("Hari "+(i+1)+": "+n)});
+ if(nt.length){y+=6;if(y>180){doc.addPage();y=M+4}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Catatan aktivitas",M,y);y+=6;doc.setFont("helvetica","normal");doc.setFontSize(10);nt.forEach(function(t){doc.text(t,M,y);y+=5.2})}
+ save("laporan-budget-backpacking.pdf",doc.output("blob"))}
+$("cpy").onclick=function(){if(!REP){msg("Belum ada laporan. Isi jumlah hari dulu.");return}copyText(REP,$("cbox"),$("cm"))};$("pdf").onclick=pdf;
+$("reset").onclick=reset;$("sa").onclick=function(){snap("A")};$("sb").onclick=function(){snap("B")};
+
+var XC=[["mk","🍜","Makan"],["tp","🚌","Transport"],["in","🏠","Inap"],["ak","🎟️","Aktivitas"],["ln","🛍️","Lain-lain"]];
+function rs(n){return n<0?"-"+rp(-n):rp(n)}
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function sd(){var q=($("start").value||"").split("-");if(q.length<3)return null;var d=new Date(+q[0],q[1]-1,+q[2]);return isNaN(d)?null:d}
+function fmtD(i){var d=sd();if(!d)return"";d.setDate(d.getDate()+i-1);return d.toLocaleDateString("id-ID",{weekday:"short",day:"numeric",month:"short"})}
+function autoDay(m){var d=sd();if(!d)return 1;var n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate()),k=Math.round((t-d)/864e5)+1;return k>=1&&k<=m.days?k:1}
+function xmsg(t){$("xm").textContent=t}
+function showView(v){var tv=v==="t";$("pv").hidden=tv;$("tv").hidden=!tv;document.querySelector(".mbar").hidden=tv;
+ document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===v)});window.scrollTo(0,0);renderTrip()}
+function updPrev(){var v=parseFloat($("xa").value),r=parseFloat($("rate").value)||0,c=($("cur").value||"").toUpperCase();
+ $("xp").textContent=xcur==="loc"?(r>0?(v>0?"≈ "+rp(v*r):"Kurs: 1 "+(c||"lokal")+" = "+rp(r)):"Isi kurs di tab Rencana dulu"):""}
+function catName(c){for(var i=0;i<XC.length;i++)if(XC[i][0]===c)return XC[i][2];return c}
+function catIcon(c){for(var i=0;i<XC.length;i++)if(XC[i][0]===c)return XC[i][1];return"•"}
+function renderTrip(){
+ var m=LM;if(!m)return;
+ var days=Math.max(m.days,1),spent=0,byDay={},byCat={};
+ EXP.forEach(function(e){spent+=e.a;byDay[e.d]=(byDay[e.d]||0)+e.a;byCat[e.c]=(byCat[e.c]||0)+e.a});
+ if(!dayInit&&ready){curDay=autoDay(m);dayInit=true}
+ if(curDay>days)curDay=days;if(curDay<1)curDay=1;
+ var bud=Math.max(0,m.sub-m.pre),avg=bud/days,sisa=bud-spent,dS=byDay[curDay]||0,rem=Math.max(1,m.days-curDay+1);
+ var allow=Math.max(0,(bud-(spent-dS))/rem),code=($("cur").value||"").toUpperCase();
+ $("tsisa").textContent=rs(sisa);$("tsp").textContent=rp(spent);$("tbd").textContent=rp(bud);$("tal").textContent=rp(allow);
+ $("tsub").textContent=spent>bud?"Melewati budget lokasi "+rp(spent-bud)+(m.t.eg>0?" (dana darurat "+rp(m.t.eg)+")":""):"Budget di luar tiket pesawat dan dokumen";
+ $("tbar").style.width=(bud>0?Math.min(100,spent/bud*100):0)+"%";
+ $("xcl").textContent=code||"Lokal";
+ document.querySelectorAll("#xcur button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.xcur===xcur)});
+ $("xcat").innerHTML=XC.map(function(c){return'<button data-xk="'+c[0]+'" aria-pressed="'+(c[0]===xcat)+'">'+c[1]+" "+c[2]+"</button>"}).join("");
+ var o="";for(var i=1;i<=m.days;i++)o+='<option value="'+i+'"'+(i===curDay?" selected":"")+'>Hari '+i+(fmtD(i)?" · "+fmtD(i):"")+"</option>";
+ if($("xd").innerHTML!==o)$("xd").innerHTML=o;$("xd").value=curDay;
+ $("xtt").textContent="Hari ke-"+curDay+" dari "+m.days+(fmtD(curDay)?" · "+fmtD(curDay):"");
+ var over=dS>allow;
+ $("xtd").innerHTML='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><b style="font:800 26px Bricolage Grotesque,sans-serif">'+rp(dS)+'</b><span class="hint" style="margin:0">dari jatah '+rp(allow)+'</span></div><div class="pb" style="height:10px;margin:8px 0"><i style="width:'+(allow>0?Math.min(100,dS/allow*100):(dS>0?100:0))+'%;background:'+(over?"var(--bad)":"#2f7a8f")+'"></i></div><p class="hint" style="margin:0;color:'+(over?"var(--bad)":"var(--mu)")+'">'+(m.days<1?"Isi jumlah hari di tab Rencana dulu.":over?"Lewat "+rp(dS-allow)+" dari jatah hari ini.":"Masih aman, sisa "+rp(allow-dS)+" untuk hari ini.")+"</p>";
+ var ds=Object.keys(byDay).map(Number).sort(function(a,b){return b-a});
+ $("xl").innerHTML=ds.length?ds.map(function(d){
+  var it=EXP.filter(function(e){return e.d===d}).sort(function(a,b){return b.t-a.t});
+  return'<div class="dr"><div style="display:flex;gap:8px;align-items:baseline"><b>Hari '+d+'</b><span class="hint" style="margin:0">'+fmtD(d)+'</span><b style="margin-left:auto;color:'+(byDay[d]>avg?"var(--bad)":"var(--ink)")+'">'+rp(byDay[d])+'</b></div><ul>'+it.map(function(e){
+   return'<li class="xi"><span>'+catIcon(e.c)+'</span><span>'+esc(e.n||catName(e.c))+(e.cc&&e.cc!=="IDR"?"<small>"+esc(e.cc)+" "+Math.round(e.oa*100)/100+"</small>":"")+'</span><b>'+rp(e.a)+'</b><button class="btn sm" data-xdel="'+esc(e.id)+'" aria-label="Hapus pengeluaran">✕</button></li>'}).join("")+"</ul></div>"}).join(""):'<p class="hint">Belum ada pengeluaran. Catat yang pertama di atas.</p>';
+ var pl={mk:m.t.fo,tp:Math.max(0,m.t.tr-m.fly),in:m.t.st,ak:m.t.ac,ln:m.t.ms};
+ $("xr").innerHTML=XC.map(function(c){var v=byCat[c[0]]||0,p=pl[c[0]]||0,bad=v>p;
+  return'<li><div class="t"><span>'+c[1]+'</span><span>'+c[2]+'</span><b>'+rp(v)+'</b></div><div class="hint" style="margin:2px 0 0">Rencana '+rp(p)+(bad?" · lewat "+rp(v-p):"")+'</div><div class="pb"><i style="width:'+(p>0?Math.min(100,v/p*100):(v>0?100:0))+'%;background:'+(bad?"var(--bad)":"#2f7a8f")+'"></i></div></li>'}).join("");
+ var sy="📱 Tersimpan otomatis di perangkat ini (localStorage). Data tetap ada walau halaman ditutup.";
+ $("tsync").textContent=ready?sy:"Memuat data..."}
+function addExp(){
+ var v=parseFloat($("xa").value),r=parseFloat($("rate").value)||0,code=($("cur").value||"").toUpperCase()||"LOKAL";
+ if(!(v>0)){xmsg("Isi jumlah lebih dari 0.");return}
+ if(xcur==="loc"&&!(r>0)){xmsg("Isi kurs di tab Rencana dulu.");return}
+ var now=Date.now(),e={d:+$("xd").value||curDay,a:Math.round(xcur==="loc"?v*r:v),c:xcat,n:$("xn").value.trim().slice(0,60),cc:xcur==="loc"?code:"IDR",oa:v,t:now},id="e"+now+Math.random().toString(36).slice(2,6);
+ e.id=id;EXP.push(e);lsSet("bp_exp",EXP);
+ $("xa").value="";$("xn").value="";updPrev();xmsg("Tersimpan: "+rp(e.a));renderTrip();$("xa").focus()}
+function delExp(id){
+ EXP=EXP.filter(function(e){return e.id!==id});lsSet("bp_exp",EXP);renderTrip()}
+function tripText(){
+ var m=LM;if(!m||!EXP.length)return"";var tot=0,L=["REKAP PENGELUARAN TRIP",($("city").value||$("country").value||"Perjalanan")+" - "+m.days+" hari",""];
+ var ds={};EXP.forEach(function(e){tot+=e.a;(ds[e.d]=ds[e.d]||[]).push(e)});
+ Object.keys(ds).map(Number).sort(function(a,b){return a-b}).forEach(function(d){var t=0;ds[d].forEach(function(e){t+=e.a});L.push("Hari "+d+(fmtD(d)?" ("+fmtD(d)+")":"")+": "+rp(t));ds[d].sort(function(a,b){return a.t-b.t}).forEach(function(e){L.push("  - "+catName(e.c)+(e.n?" ("+e.n+")":"")+": "+rp(e.a))})});
+ var bud=Math.max(0,m.sub-m.pre);L.push("","Total terpakai: "+rp(tot),"Budget di lokasi: "+rp(bud),"Sisa: "+rs(bud-tot));return L.join("\n")}
+function csvText(){
+ var rows=[["hari","tanggal","kategori","catatan","jumlah_rp","mata_uang","jumlah_asal"]];
+ EXP.slice().sort(function(a,b){return a.d-b.d||a.t-b.t}).forEach(function(e){rows.push([e.d,fmtD(e.d),catName(e.c),e.n,e.a,e.cc,e.oa])});
+ return"\ufeff"+rows.map(function(r){return r.map(function(c){return'"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(",")}).join("\n")}
+function snapshot(){var o={f:{},cities:cities,dF:dF,dA:dA,dAn:dAn,style:style,mult:mult,bpm:bpm};
+ document.querySelectorAll("#pv [id]").forEach(function(el){if(el.tagName==="INPUT"||el.tagName==="SELECT")o.f[el.id]=el.type==="checkbox"?el.checked:el.value});return o}
+function restore(o){restoring=true;
+ for(var k in o.f){var el=$(k);if(!el)continue;if(el.type==="checkbox")el.checked=!!o.f[k];else el.value=o.f[k]}
+ cities=o.cities||[];dF=o.dF||[];dA=o.dA||[];dAn=o.dAn||[];style=o.style||"b";mult=o.mult||1;bpm=!!o.bpm;
+ $("cpc").disabled=$("cp").value!=="c";$("days").disabled=!$("man").checked;
+ drawC();lastN=-1;lockMulti();paint();calc();restoring=false}
+function schedSave(){clearTimeout(saveT);saveT=setTimeout(function(){
+ var j=JSON.stringify(snapshot());if(j===lastJ)return;lastJ=j;
+ lsSet("bp_plan",j)},700)}
+function initStore(){
+ var j=lsGet("bp_plan");if(typeof j==="string"){lastJ=j;try{restore(JSON.parse(j))}catch(e){}}
+ EXP=lsGet("bp_exp")||[];ready=true;renderTrip()}
+$("xadd").onclick=addExp;
+$("xcp").onclick=function(){var t=tripText();if(!t){$("xm2").textContent="Belum ada pengeluaran untuk direkap.";return}copyText(t,$("xbox"),$("xm2"))};
+$("xcsv").onclick=function(){if(!EXP.length){$("xm2").textContent="Belum ada pengeluaran untuk diunduh.";return}save("pengeluaran-trip.csv",csvText(),$("xm2"))};
+reset();initStore();
+})();
+</script></body></html>
