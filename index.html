@@ -472,13 +472,19 @@ function fbUI(){
  $("ghwho").textContent=on?("👤 "+(FB.user.displayName||FB.user.email||"Pengguna")):"Belum login";
  $("ghloginbox").hidden=on;$("fblogout").hidden=!on;
  if(!on)$("ghmsg").textContent="Masuk agar data sinkron antar perangkat.";}
+function fbParse(d){
+ if(!d)return null;
+ if(typeof d.data==="string"){try{var o=JSON.parse(d.data);if(o&&(o.plan||o.exp))return o;}catch(e){}return null;}
+ if(d.plan||d.exp)return {plan:d.plan,exp:d.exp};
+ return null;}
 function fbStart(){
  if(FB.unsub){FB.unsub();FB.unsub=null;}
  $("ghmsg").textContent="Memuat data dari cloud...";
  var ref=FB.db.collection("budgets").doc(FB.user.uid);
  ref.get().then(function(doc){
-  var d=doc.exists?doc.data():null;
-  if(d&&(d.updated_at||d.plan||d.exp)){fbApply(d,d.updated_at||0);}
+  var raw=doc.exists?doc.data():null;
+  var p=fbParse(raw);
+  if(p){fbApply(p,(raw&&raw.updated_at)||0);}
   else{$("ghmsg").textContent="Data cloud kosong. Mengunggah data perangkat ini...";fbPush(true);}
   fbSubscribe();
  }).catch(function(e){$("ghmsg").textContent="Gagal memuat data: "+e.message;fbSubscribe();});}
@@ -487,8 +493,9 @@ function fbSubscribe(){
  FB.unsub=FB.db.collection("budgets").doc(FB.user.uid).onSnapshot(function(doc){
   if(FB.applying)return;
   var d=doc.data();if(!d)return;
+  var p=fbParse(d);if(!p)return;
   var remote=d.updated_at||0,localUp=lsGet("bp_updated")||0;
-  if(remote>localUp){fbApply(d,remote);}
+  if(remote>localUp){fbApply(p,remote);}
   else if(remote<localUp){fbPush();}
  },function(err){$("ghmsg").textContent="Gagal sinkron: "+err.message;});}
 function fbApply(d,remote){
@@ -504,7 +511,8 @@ function fbPush(imm){
  var go=function(){
   if(!FB.user)return;
   var now=Date.now();$("ghmsg").textContent="Mengunggah ke cloud...";
-  FB.db.collection("budgets").doc(FB.user.uid).set({app:"backpackcalculatorali",updated_at:now,plan:snapshot(),exp:EXP})
+  var payload=JSON.stringify({plan:snapshot(),exp:EXP});
+  FB.db.collection("budgets").doc(FB.user.uid).set({app:"backpackcalculatorali",updated_at:now,data:payload})
    .then(function(){lsSet("bp_updated",now);FB.when=now;$("ghmsg").textContent="☁️ Tersinkron "+new Date(now).toLocaleTimeString("id-ID")})
    .catch(function(e){$("ghmsg").textContent="Gagal sinkron: "+((e&&e.message)||e)});};
  if(imm)go();else FB.pushT=setTimeout(go,1200);}
