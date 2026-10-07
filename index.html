@@ -117,6 +117,17 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 <section class="tot" aria-live="polite"><div class="s">Sisa budget di lokasi</div><div class="big" id="tsisa"></div><div class="s" id="tsub"></div>
 <div class="pb" style="margin-top:10px;background:rgba(255,255,255,.25)"><i id="tbar" style="background:var(--ac)"></i></div>
 <div class="st"><div>Terpakai<b id="tsp"></b></div><div>Budget lokasi<b id="tbd"></b></div><div>Jatah hari ini<b id="tal"></b></div></div></section>
+<section class="pn"><h2>💰 Total pengeluaran trip</h2>
+<div id="xgt" style="font:800 clamp(28px,7vw,40px)/1.05 'Bricolage Grotesque',sans-serif;margin:2px 0 10px"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px">
+<div><div class="hint" style="margin:0">Transaksi</div><b id="xgn"></b></div>
+<div><div class="hint" style="margin:0">Rata-rata / hari</div><b id="xga"></b></div>
+<div><div class="hint" style="margin:0">Total budget rencana</div><b id="xgb"></b></div>
+<div><div class="hint" style="margin:0">Sisa / lebih</div><b id="xgs"></b></div>
+</div>
+<p class="hint" id="xgh"></p>
+<div class="top" style="margin:10px 0 0"><button class="btn" id="xclear">Kosongkan pengeluaran</button></div>
+<p class="hint" id="xm3" role="status"></p></section>
 <section class="pn"><h2>Catat pengeluaran</h2>
 <label for="xa">Jumlah</label><input id="xa" type="number" min="0" step="any" inputmode="decimal" placeholder="0" autocomplete="off">
 <label>Mata uang</label><div class="seg" id="xcur" style="grid-template-columns:1fr 1fr"><button data-xcur="idr" aria-pressed="true">Rp</button><button data-xcur="loc" aria-pressed="false" id="xcl">Lokal</button></div>
@@ -401,6 +412,13 @@ function renderTrip(){
  var pl={mk:m.t.fo,tp:Math.max(0,m.t.tr-m.fly),in:m.t.st,ak:m.t.ac,ln:m.t.ms};
  $("xr").innerHTML=XC.map(function(c){var v=byCat[c[0]]||0,p=pl[c[0]]||0,bad=v>p;
   return'<li><div class="t"><span>'+c[1]+'</span><span>'+c[2]+'</span><b>'+rp(v)+'</b></div><div class="hint" style="margin:2px 0 0">Rencana '+rp(p)+(bad?" · lewat "+rp(v-p):"")+'</div><div class="pb"><i style="width:'+(p>0?Math.min(100,v/p*100):(v>0?100:0))+'%;background:'+(bad?"var(--bad)":"#2f7a8f")+'"></i></div></li>'}).join("");
+ var usedDays=Object.keys(byDay).length,tdiff=m.total-spent;
+ $("xgt").textContent=rp(spent);
+ $("xgn").textContent=EXP.length+(usedDays?" catatan · "+usedDays+" dari "+m.days+" hari":" catatan");
+ $("xga").textContent=rp(days>0?spent/days:0);
+ $("xgb").textContent=rp(m.total);
+ $("xgs").innerHTML='<span style="color:'+(tdiff<0?"var(--bad)":"var(--g)")+'">'+rs(tdiff)+'</span>';
+ $("xgh").textContent=spent<=0?"Belum ada pengeluaran. Catat di bawah; datanya tersimpan otomatis dan bisa dilihat kapan saja.":"Total seluruh pengeluaran dari hari 1 sampai hari terakhir. Tersimpan otomatis di perangkat ini.";
  var sy="📱 Tersimpan otomatis di perangkat ini (localStorage). Data tetap ada walau halaman ditutup.";
  $("tsync").textContent=ready?sy:"Memuat data..."}
 function addExp(){
@@ -416,7 +434,7 @@ function tripText(){
  var m=LM;if(!m||!EXP.length)return"";var tot=0,L=["REKAP PENGELUARAN TRIP",($("city").value||$("country").value||"Perjalanan")+" - "+m.days+" hari",""];
  var ds={};EXP.forEach(function(e){tot+=e.a;(ds[e.d]=ds[e.d]||[]).push(e)});
  Object.keys(ds).map(Number).sort(function(a,b){return a-b}).forEach(function(d){var t=0;ds[d].forEach(function(e){t+=e.a});L.push("Hari "+d+(fmtD(d)?" ("+fmtD(d)+")":"")+": "+rp(t));ds[d].sort(function(a,b){return a.t-b.t}).forEach(function(e){L.push("  - "+catName(e.c)+(e.n?" ("+e.n+")":"")+": "+rp(e.a))})});
- var bud=Math.max(0,m.sub-m.pre);L.push("","Total terpakai: "+rp(tot),"Budget di lokasi: "+rp(bud),"Sisa: "+rs(bud-tot));return L.join("\n")}
+ var bud=Math.max(0,m.sub-m.pre);L.push("","TOTAL PENGELUARAN SEMUA HARI: "+rp(tot),"Jumlah transaksi: "+EXP.length,"Total budget rencana: "+rp(m.total),"Budget di lokasi: "+rp(bud),"Sisa budget lokasi: "+rs(bud-tot),"Sisa dari total budget: "+rs(m.total-tot));return L.join("\n")}
 function csvText(){
  var rows=[["hari","tanggal","kategori","catatan","jumlah_rp","mata_uang","jumlah_asal"]];
  EXP.slice().sort(function(a,b){return a.d-b.d||a.t-b.t}).forEach(function(e){rows.push([e.d,fmtD(e.d),catName(e.c),e.n,e.a,e.cc,e.oa])});
@@ -435,6 +453,10 @@ function initStore(){
  var j=lsGet("bp_plan");if(typeof j==="string"){lastJ=j;try{restore(JSON.parse(j))}catch(e){}}
  EXP=lsGet("bp_exp")||[];ready=true;renderTrip()}
 $("xadd").onclick=addExp;
+$("xclear").onclick=function(){
+ if(!EXP.length){$("xm3").textContent="Belum ada pengeluaran.";return}
+ if(!window.confirm("Hapus SEMUA catatan pengeluaran trip ini? Tidak bisa dibatalkan."))return;
+ EXP=[];lsSet("bp_exp",EXP);renderTrip();$("xm3").textContent="Semua pengeluaran sudah dihapus."};
 $("xcp").onclick=function(){var t=tripText();if(!t){$("xm2").textContent="Belum ada pengeluaran untuk direkap.";return}copyText(t,$("xbox"),$("xm2"))};
 $("xcsv").onclick=function(){if(!EXP.length){$("xm2").textContent="Belum ada pengeluaran untuk diunduh.";return}save("pengeluaran-trip.csv",csvText(),$("xm2"))};
 buildCountryList();reset();buildCityList($("country").value);autoRate($("cur").value);initStore();
