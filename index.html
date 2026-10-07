@@ -4,17 +4,19 @@
 <title>Backpacking Budget Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#ffffff;--pn:#ffffff;--soft:#f8fafc;--ink:#181d26;--mu:#41454d;--ln:#dddddd;--ac:#181d26;--g:#006400;--bad:#aa2d00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#F5F0E6;--pn:#FBF8F1;--soft:#F1EADD;--ink:#1A1614;--mu:#6E6559;--ln:#E2D8C6;--ac:#6B1F2A;--add:#C07A3E;--g:#3F7D58;--bad:#D6402F;--sky:#7DB9DE;--warnbg:#F7E4E0;--warnink:#8C2F22;--warnln:#E3B8B1;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141110;--pn:#1F1A18;--soft:#241E1B;--ink:#F0EAE2;--mu:#A79C90;--ln:#342C28;--ac:#B04A58;--add:#C07A3E;--g:#5FA877;--bad:#E0644F;--sky:#7DB9DE;--warnbg:#3A211E;--warnink:#F0B9AE;--warnln:#5A322C}}
+:root[data-theme="dark"]{--bg:#141110;--pn:#1F1A18;--soft:#241E1B;--ink:#F0EAE2;--mu:#A79C90;--ln:#342C28;--ac:#B04A58;--add:#C07A3E;--g:#5FA877;--bad:#E0644F;--sky:#7DB9DE;--warnbg:#3A211E;--warnink:#F0B9AE;--warnln:#5A322C}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Inter",system-ui,sans-serif;padding-bottom:84px}
 .wrap{max-width:1080px;margin:0 auto;padding:24px 16px}
-h1{font:500 clamp(28px,5.5vw,40px)/1.15 "Inter",system-ui,sans-serif;margin:0 0 6px;letter-spacing:-.01em}
-h2{font:500 18px "Inter",system-ui,sans-serif;margin:0 0 10px}
+h1{font:500 clamp(28px,5.5vw,40px)/1.15 "Inter",system-ui,sans-serif;color:var(--ac);margin:0 0 6px;letter-spacing:-.01em}
+h2{font:500 18px "Inter",system-ui,sans-serif;color:var(--ac);margin:0 0 10px}
 .sub{color:var(--mu);margin:0 0 14px}.top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
 .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:start}
 @media(max-width:860px){.grid{grid-template-columns:1fr}}
 .pn,details{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:14px 16px;margin-bottom:12px}
-summary{font:500 17px "Inter",system-ui,sans-serif;cursor:pointer;min-height:32px;list-style-position:inside}
+summary{font:500 17px "Inter",system-ui,sans-serif;color:var(--ac);cursor:pointer;min-height:32px;list-style-position:inside}
 details[open] summary{margin-bottom:8px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}.g2 .full{grid-column:1/-1}
 @media(max-width:420px){.g2{grid-template-columns:1fr}}
@@ -22,27 +24,29 @@ label{display:block;font-size:13px;color:var(--mu);margin:10px 0 3px}
 input,select{width:100%;font:400 16px "Inter",system-ui,sans-serif;color:var(--ink);background:var(--soft);border:1px solid var(--ln);border-radius:6px;padding:10px 12px;min-height:48px}
 input:disabled{opacity:.45}input[type=checkbox]{width:20px;min-height:20px;height:20px;vertical-align:middle;margin-right:8px}
 .chk{display:flex;align-items:center;margin-top:10px;font-size:15px;color:var(--ink)}
-:is(input,select,button,summary):focus-visible{outline:2px solid #458fff;outline-offset:1px}
-input:focus,select:focus,textarea:focus{border-color:#458fff;box-shadow:0 0 0 1px #458fff}
+:is(input,select,button,summary):focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
 .seg{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ln);border-radius:8px;overflow:hidden}
 .seg button{border:0;border-left:1px solid var(--ln);background:var(--soft);color:var(--ink);font:500 14px "Inter",sans-serif;padding:10px 2px;min-height:44px;cursor:pointer}
 .seg button:first-child{border-left:0}.seg button[aria-pressed=true]{background:var(--ac);color:#fff}
 .hint{font-size:12.5px;color:var(--mu);margin:6px 0 0}
 .btn{border:1px solid var(--ln);background:var(--pn);color:var(--ink);font:500 15px "Inter",sans-serif;border-radius:12px;padding:10px 16px;min-height:48px;cursor:pointer;transition:background .15s,border-color .15s}
 .btn.pri{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:500}
-.btn.pri:hover,.btn.pri:active{background:#0d1218;border-color:#0d1218}
+.btn.pri:hover,.btn.pri:active{background:#571823;border-color:#571823}
 .btn:hover{border-color:var(--ink)}
 .btn[aria-pressed=true]{background:var(--ac);border-color:var(--ac);color:#fff}
 .btn.sm{min-height:44px;padding:6px 12px}
+.btn.act{background:var(--add);border-color:var(--add);color:#fff;font-weight:500}
+.btn.act:hover,.btn.act:active{background:#a9672f;border-color:#a9672f}
 .city{border:1px solid var(--ln);border-radius:10px;padding:10px;margin-bottom:10px}
 .city .r{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.city .n{display:grid;grid-template-columns:1fr auto;gap:8px}
 @media(max-width:520px){.city .r{grid-template-columns:1fr 1fr}}
-.tot{background:#aa2d00;color:#fff;border-radius:12px;padding:24px;margin-bottom:12px;box-shadow:0 6px 16px rgba(170,45,0,.18)}
+.tot{background:var(--ac);color:#fff;border-radius:12px;padding:24px;margin-bottom:12px;box-shadow:0 6px 16px rgba(107,31,42,.18)}
 .tot .big{font:500 clamp(30px,7vw,44px)/1.05 "Inter",sans-serif;margin:2px 0 4px;overflow-wrap:anywhere}
 .tot .s{font-size:14px;opacity:.88}.st{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
 .st div{border-top:1px solid rgba(255,255,255,.28);padding-top:6px;font-size:12.5px}.st b{display:block;font:500 16px "Inter",sans-serif;overflow-wrap:anywhere}
 .badge{display:inline-block;font:500 16px "Inter",sans-serif;padding:6px 12px;border-radius:999px;background:var(--soft);border:1px solid var(--ln)}
-.warn{background:#f5e9d4;color:#181d26;border:1px solid #e6d3b3;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.warn{background:var(--warnbg);color:var(--warnink);border:1px solid var(--warnln);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:14px}
 .warn:empty{display:none}
 .bk{display:flex;gap:16px;align-items:center}.donut{width:132px;height:132px;border-radius:50%;flex:none;display:grid;place-items:center}
 .donut i{width:84px;height:84px;border-radius:50%;background:var(--pn);display:grid;place-items:center;font:500 13px "Inter";font-style:normal;color:var(--mu);text-align:center}
@@ -51,7 +55,7 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 .lg .t{display:flex;gap:8px;align-items:center}.lg .t span:nth-child(2){flex:1}.pb{height:6px;border-radius:3px;background:var(--ln);margin-top:4px;overflow:hidden}.pb i{display:block;height:100%}
 .top1{font-size:11px;background:var(--ac);color:#fff;border-radius:999px;padding:1px 8px;font-weight:500}
 .dl{max-height:300px;overflow:auto}.dl li{display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;padding:5px 0;font-size:14px}
-.dl .b{height:8px;background:var(--ln);border-radius:4px;overflow:hidden}.dl .b i{display:block;height:100%;background:#181d26}
+.dl .b{height:8px;background:var(--ln);border-radius:4px;overflow:hidden}.dl .b i{display:block;height:100%;background:var(--sky)}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.cmp>div{border:1px solid var(--ln);border-radius:10px;padding:10px;font-size:14px}.cmp b{display:block;font:500 18px "Inter",sans-serif}
 .tw{overflow-x:auto;margin-top:10px}table{border-collapse:collapse;width:100%;font-size:13px;min-width:600px}th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:var(--mu);font-weight:500}tfoot td{font-weight:700}tfoot tr:first-child td{border-top:2px solid var(--ink)}
 @media print{body *{visibility:hidden}#rep,#rep *{visibility:visible}#rep{position:absolute;left:0;top:0;width:100%;border:0}#rep .top{display:none}.tw{overflow:visible}table{min-width:0}body{background:#fff;color:#000;padding:0}}
@@ -125,7 +129,7 @@ input,select,textarea{min-width:0;max-width:100%}
 
 <details><summary>🗺️ Multi-kota</summary>
 <div class="chk"><input type="checkbox" id="multi"><label for="multi" style="margin:0;color:var(--ink)">Aktifkan multi-kota</label></div>
-<div id="mb" hidden><p class="hint">Penginapan, makan, dan transport lokal mengikuti tiap kota. Tiket pesawat, bus/kereta/ferry, dokumen, dan lainnya tetap di bagian masing-masing.</p><div id="cities"></div><button class="btn" id="addc">+ Tambah kota</button></div></details>
+<div id="mb" hidden><p class="hint">Penginapan, makan, dan transport lokal mengikuti tiap kota. Tiket pesawat, bus/kereta/ferry, dokumen, dan lainnya tetap di bagian masing-masing.</p><div id="cities"></div><button class="btn act" id="addc">+ Tambah kota</button></div></details>
 
 <details open><summary>🛡️ Dana darurat</summary><div class="g2">
 <div><label for="cp">Persentase dari subtotal</label><select id="cp"><option value="5">5%</option><option value="10" selected>10%</option><option value="15">15%</option><option value="20">20%</option><option value="c">Custom</option></select></div>
@@ -170,7 +174,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <p class="hint" id="xp"></p>
 <label>Kategori</label><div class="chips" id="xcat"></div>
 <div class="g2"><div><label for="xn">Catatan</label><input id="xn" maxlength="60" placeholder="mis. pad thai" autocomplete="off"></div><div><label for="xd">Hari ke</label><select id="xd"></select></div></div>
-<button class="btn pri" id="xadd" style="width:100%;margin-top:14px;min-height:52px;font-size:17px">+ Tambah pengeluaran</button><p class="hint" id="xm" role="status"></p></section>
+<button class="btn act" id="xadd" style="width:100%;margin-top:14px;min-height:52px;font-size:17px">+ Tambah pengeluaran</button><p class="hint" id="xm" role="status"></p></section>
 <section class="pn"><h2 id="xtt">Hari ini</h2><div id="xtd"></div></section>
 <section class="pn"><h2>Riwayat per hari</h2><div id="xl"></div></section>
 <section class="pn"><h2>Rekap per kategori</h2><ul class="lg" id="xr"></ul></section>
@@ -229,7 +233,7 @@ function autoRate(code){
   var v=parseFloat(r[code.toLowerCase()]);
   if(v>0){$("rate").value=Math.round(1/v);rateNote="Kurs "+code+" terisi otomatis dari data terbaru ("+new Date().toLocaleDateString("id-ID")+"). Bisa diubah manual.";setRhint(rateNote);calc()}
   else if(!fb)setRhint("Kurs "+code+" tidak ditemukan. Isi manual ya.")})}
-var CAT=[["tr","✈️","Transportasi","#aa2d00"],["st","🏠","Akomodasi","#0a2e0e"],["fo","🍜","Makanan","#d9a441"],["ac","🎟️","Aktivitas","#fcab79"],["dc","🛂","Dokumen","#41454d"],["ms","🛍️","Lain-lain","#9297a0"],["eg","🛡️","Dana darurat","#a8d8c4"]];
+var CAT=[["tr","✈️","Transportasi","#6B1F2A"],["st","🏠","Akomodasi","#7DB9DE"],["fo","🍜","Makanan","#C07A3E"],["ac","🎟️","Aktivitas","#3F7D58"],["dc","🛂","Dokumen","#8C8175"],["ms","🛍️","Lain-lain","#1A1614"],["eg","🛡️","Dana darurat","#5C5349"]];
 function N(id){var r=parseFloat($(id).value);if(r<0){warns[$(id).dataset.l+" tidak boleh negatif, dihitung 0"]=1;return 0}return isFinite(r)?r:0}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function r5(x){return Math.round(x/5000)*5000}
@@ -430,7 +434,7 @@ function renderTrip(){
  var bud=Math.max(0,m.sub-m.pre),avg=bud/days,sisa=bud-spent,dS=byDay[curDay]||0,rem=Math.max(1,m.days-curDay+1);
  var allow=Math.max(0,(bud-(spent-dS))/rem),code=($("cur").value||"").toUpperCase();
  $("tsisa").textContent=rs(sisa);$("tsp").textContent=rp(spent);$("tbd").textContent=rp(bud);$("tal").textContent=rp(allow);
- $("tsub").textContent=spent>bud?"Melewati budget lokasi "+rp(spent-bud)+(m.t.eg>0?" (dana darurat "+rp(m.t.eg)+")":""):"Budget di luar tiket pesawat dan dokumen";
+ $("tsub").textContent=spent>bud?"⚠️ Melewati budget lokasi "+rp(spent-bud)+(m.t.eg>0?" (dana darurat "+rp(m.t.eg)+")":""):"Budget di luar tiket pesawat dan dokumen";
  $("tbar").style.width=(bud>0?Math.min(100,spent/bud*100):0)+"%";
  $("xcl").textContent=code||"Lokal";
  document.querySelectorAll("#xcur button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.xcur===xcur)});
@@ -439,7 +443,7 @@ function renderTrip(){
  if($("xd").innerHTML!==o)$("xd").innerHTML=o;$("xd").value=curDay;
  $("xtt").textContent="Hari ke-"+curDay+" dari "+m.days+(fmtD(curDay)?" · "+fmtD(curDay):"");
  var over=dS>allow;
- $("xtd").innerHTML='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><b style="font:500 26px Inter,sans-serif">'+rp(dS)+'</b><span class="hint" style="margin:0">dari jatah '+rp(allow)+'</span></div><div class="pb" style="height:10px;margin:8px 0"><i style="width:'+(allow>0?Math.min(100,dS/allow*100):(dS>0?100:0))+'%;background:'+(over?"var(--bad)":"#181d26")+'"></i></div><p class="hint" style="margin:0;color:'+(over?"var(--bad)":"var(--mu)")+'">'+(m.days<1?"Isi jumlah hari di tab Rencana dulu.":over?"Lewat "+rp(dS-allow)+" dari jatah hari ini.":"Masih aman, sisa "+rp(allow-dS)+" untuk hari ini.")+"</p>";
+ $("xtd").innerHTML='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><b style="font:500 26px Inter,sans-serif">'+rp(dS)+'</b><span class="hint" style="margin:0">dari jatah '+rp(allow)+'</span></div><div class="pb" style="height:10px;margin:8px 0"><i style="width:'+(allow>0?Math.min(100,dS/allow*100):(dS>0?100:0))+'%;background:'+(over?"var(--bad)":"var(--g)")+'"></i></div><p class="hint" style="margin:0;color:'+(over?"var(--bad)":"var(--g)")+'">'+(m.days<1?"Isi jumlah hari di tab Rencana dulu.":over?"⚠️ Lewat "+rp(dS-allow)+" dari jatah hari ini.":"Masih aman, sisa "+rp(allow-dS)+" untuk hari ini.")+"</p>";
  var ds=Object.keys(byDay).map(Number).sort(function(a,b){return b-a});
  $("xl").innerHTML=ds.length?ds.map(function(d){
   var it=EXP.filter(function(e){return e.d===d}).sort(function(a,b){return b.t-a.t});
@@ -447,13 +451,13 @@ function renderTrip(){
    return'<li class="xi"><span>'+catIcon(e.c)+'</span><span>'+esc(e.n||catName(e.c))+(e.cc&&e.cc!=="IDR"?"<small>"+esc(e.cc)+" "+Math.round(e.oa*100)/100+"</small>":"")+'</span><b>'+rp(e.a)+'</b><button class="btn sm" data-xdel="'+esc(e.id)+'" aria-label="Hapus pengeluaran">✕</button></li>'}).join("")+"</ul></div>"}).join(""):'<p class="hint">Belum ada pengeluaran. Catat yang pertama di atas.</p>';
  var pl={mk:m.t.fo,tp:Math.max(0,m.t.tr-m.fly),in:m.t.st,ak:m.t.ac,ln:m.t.ms};
  $("xr").innerHTML=XC.map(function(c){var v=byCat[c[0]]||0,p=pl[c[0]]||0,bad=v>p;
-  return'<li><div class="t"><span>'+c[1]+'</span><span>'+c[2]+'</span><b>'+rp(v)+'</b></div><div class="hint" style="margin:2px 0 0">Rencana '+rp(p)+(bad?" · lewat "+rp(v-p):"")+'</div><div class="pb"><i style="width:'+(p>0?Math.min(100,v/p*100):(v>0?100:0))+'%;background:'+(bad?"var(--bad)":"#181d26")+'"></i></div></li>'}).join("");
+  return'<li><div class="t"><span>'+c[1]+'</span><span>'+c[2]+'</span><b>'+rp(v)+'</b></div><div class="hint" style="margin:2px 0 0">Rencana '+rp(p)+(bad?" · ⚠️ lewat "+rp(v-p):"")+'</div><div class="pb"><i style="width:'+(p>0?Math.min(100,v/p*100):(v>0?100:0))+'%;background:'+(bad?"var(--bad)":"var(--g)")+'"></i></div></li>'}).join("");
  var usedDays=Object.keys(byDay).length,tdiff=m.total-spent;
  $("xgt").textContent=rp(spent);
  $("xgn").textContent=EXP.length+(usedDays?" catatan · "+usedDays+" dari "+m.days+" hari":" catatan");
  $("xga").textContent=rp(days>0?spent/days:0);
  $("xgb").textContent=rp(m.total);
- $("xgs").innerHTML='<span style="color:'+(tdiff<0?"var(--bad)":"var(--g)")+'">'+rs(tdiff)+'</span>';
+ $("xgs").innerHTML='<span style="color:'+(tdiff<0?"var(--bad)":"var(--g)")+'">'+(tdiff<0?"⚠️ ":"")+rs(tdiff)+'</span>';
  $("xgh").textContent=spent<=0?"Belum ada pengeluaran. Catat di bawah; datanya tersimpan otomatis dan bisa dilihat kapan saja.":"Total seluruh pengeluaran dari hari 1 sampai hari terakhir. Tersimpan otomatis di perangkat ini.";
  var sy=FB.user?("☁️ Tersinkron ke cloud sebagai "+(FB.user.displayName||FB.user.email||"")+(FB.when?" · terakhir "+new Date(FB.when).toLocaleString("id-ID"):"")):"📱 Tersimpan di perangkat ini. Masuk (panel atas) agar sinkron antar perangkat.";
  $("tsync").textContent=ready?sy:"Memuat data..."}
