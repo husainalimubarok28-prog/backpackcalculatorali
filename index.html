@@ -76,7 +76,7 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 <p class="hint" style="margin-top:8px">Data disimpan di database Firebase-mu dan hanya bisa diakses oleh akunmu. Tanpa login, data tetap tersimpan di perangkat ini saja.</p>
 </div>
 </section>
-<div id="pv"><div class="top"><button class="btn pri" id="bpm" aria-pressed="false">🎒 Backpacker Mode</button><button class="btn" id="reset">Reset</button></div>
+<div id="pv"><div class="top"><button class="btn pri" id="bpm" aria-pressed="false">🎒 Mode Hemat</button><button class="btn" id="reset">Reset</button></div>
 <div class="grid"><div id="in">
 
 <details open><summary>🧭 Perjalanan</summary><div class="g2">
@@ -92,7 +92,7 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 </div><p class="hint" id="rhint">Pilih negara untuk mengisi mata uang &amp; kurs otomatis.</p><p class="hint">Saat memilih negara, kolom mata uang dan kurs terisi otomatis (kurs terbaru; cadangan perkiraan bila offline) dan tetap bisa diubah manual. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p></details>
 
 <details open><summary>🎚️ Gaya perjalanan</summary>
-<div class="seg" id="seg"><button data-s="h">Hemat</button><button data-s="b">Backpacker</button><button data-s="n">Nyaman</button><button data-s="c">Custom</button></div>
+<div class="seg" id="seg" style="grid-template-columns:1fr 1fr 1fr"><button data-s="h">Hemat</button><button data-s="n">Nyaman</button><button data-s="m">Mewah</button></div>
 <p class="hint" id="sh"></p></details>
 
 <div id="secs"></div>
@@ -253,10 +253,8 @@ function calc(){
  $("mt").textContent=rp(m.total);$("mp").textContent=rp(m.pp);
  var rate=N("rate");
  $("loc").textContent=rate>0?"≈ "+(code||"")+" "+Math.round(m.total/rate).toLocaleString("id-ID")+" ("+(code||"lokal")+" "+Math.round(m.pp/rate).toLocaleString("id-ID")+" per orang)":"Isi kurs untuk melihat total dalam mata uang lokal";
- var S={h:["🟢 HEMAT"],b:["🟡 BACKPACKER"],n:["🟠 NYAMAN"]},bd,bh;
- if(style!=="c"){bd=S[style][0];bh="Berdasarkan gaya perjalanan yang kamu pilih."}
- else{var r=m.daily/343000;bd=r<=.45?"🟢 SUPER HEMAT":r<=.8?"🟢 HEMAT":r<=1.3?"🟡 BACKPACKER":r<=2.2?"🟠 NYAMAN":"🔴 PREMIUM";
-  bh="Gaya Custom dinilai dari biaya harianmu ("+rp(m.daily)+" per orang) dibanding patokan gaya Backpacker bawaan, bukan angka global."}
+ var S={h:["🟢 HEMAT"],n:["🟠 NYAMAN"],m:["🔴 MEWAH"]},bd,bh;
+ var s=S[style]||S.n;bd=s[0];bh="Berdasarkan gaya perjalanan yang kamu pilih.";
  $("bd").textContent=bd;$("bh").textContent=bh;
  var tot=m.total||1,acc=0,g=[],mx=0;CAT.forEach(function(c){mx=Math.max(mx,m.t[c[0]])});
  var lg="";CAT.forEach(function(c){var v=m.t[c[0]],p=v/tot*100;g.push(c[3]+" "+acc+"% "+(acc+p)+"%");acc+=p;
@@ -280,7 +278,7 @@ function calc(){
  REP=m.days>0?"LAPORAN BUDGET BACKPACKING\n"+($("city").value||$("country").value||"Perjalanan")+" · "+m.days+" hari · "+m.ppl+" orang\n\n"+R.map(function(o,i){return"Hari "+(i+1)+": "+rp(o.t)+" (transport "+rp(o.tr)+", inap "+rp(o.st)+", makan "+rp(o.fo)+", aktivitas "+rp(o.ac)+(dAn[i]&&$("apd").checked?" ["+dAn[i]+"]":"")+(o.dc?", dokumen "+rp(o.dc):"")+(o.ms?", lain-lain "+rp(o.ms):"")+")"}).join("\n")+"\n\nRINGKASAN\n"+lines.join("\n"):"";
  RPT=m.days>0?{sub:($("city").value||$("country").value||"Perjalanan")+" - "+m.days+" hari - "+m.ppl+" orang",lines:lines,R:R,t:m.t,subtotal:m.sub,total:m.total,notes:$("apd").checked?dAn.slice():[]}:null;
  var w=Object.keys(warns);$("warn").innerHTML=w.map(esc).join("<br>");
- $("sh").textContent={h:"Hostel/dorm, makan murah, transportasi umum, aktivitas gratis atau murah.",b:"Hostel/guesthouse, makan lokal, transportasi umum, beberapa aktivitas berbayar.",n:"Hotel budget, makan lebih fleksibel, transportasi nyaman, lebih banyak aktivitas.",c:"Atur sendiri setiap biaya di bagian bawah."}[style];
+ $("sh").textContent={h:"Hostel/dorm, makan murah, transportasi umum, aktivitas gratis atau murah.",n:"Hotel budget, makan lebih fleksibel, transportasi nyaman, lebih banyak aktivitas.",m:"Hotel bintang, makan di restoran, taksi/kereta cepat, aktivitas premium."}[style]||"";
  LM=m;renderTrip();if(ready&&!restoring)schedSave();cmp(m);return m}
 function cmp(m){
  var o="";
@@ -310,15 +308,15 @@ function lockMulti(){var on=$("multi").checked;$("mb").hidden=!on;lockFields();
  if(on&&!cities.length){var fs=N("bf")+N("lunch")+N("dinner")+N("snack");cities=[{n:$("city").value||"Kota 1",d:Math.max(1,daysCalc()||3),stay:N("stay"),food:fs,local:N("local"),act:0}];drawC()}}
 function paint(){document.querySelectorAll("#seg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.s===style)});$("bpm").setAttribute("aria-pressed",bpm)}
 function setStyle(s){
- if(s!=="c"){var m={h:.6,b:1,n:1.8}[s],old=mult;mult=m;
-  for(var k in BASE)$(k).value=r5(BASE[k]*m);
-  cities.forEach(function(c){["stay","food","local","act"].forEach(function(k){c[k]=r5(c[k]/old*m)})});drawC()}
+ var mm={h:.6,n:1,m:2.2}[s]||1,old=mult;mult=mm;
+ for(var k in BASE)$(k).value=r5(BASE[k]*mm);
+ cities.forEach(function(c){["stay","food","local","act"].forEach(function(k){c[k]=r5(c[k]/old*mm)})});drawC();
  style=s;paint()}
 function reset(){
  for(var k in DEF)$(k).value=DEF[k];
  $("country").value="Thailand";$("city").value="Bangkok";$("start").value="2026-11-20";$("end").value="2026-11-26";$("man").checked=false;$("people").value=1;$("cur").value="THB";$("rate").value=500;
  $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];drawC();lockMulti();syncDays();
- A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="b";paint();$("days").disabled=true;calc();buildCityList($("country").value)}
+ A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="n";paint();$("days").disabled=true;calc();buildCityList($("country").value)}
 document.addEventListener("input",function(e){var t=e.target;
  if(t.closest("#tv")){if(t.id==="xd"){curDay=+t.value||1;renderTrip()}else updPrev();return}
  if(t.dataset.pd){var i=+t.dataset.i,v=Math.max(0,parseFloat(t.value)||0);
@@ -326,7 +324,6 @@ document.addEventListener("input",function(e){var t=e.target;
   updF();updA();calc();return}
  if(t.id==="fpd"||t.id==="apd"){lastN=-1;lockFields();syncDays()}
  if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:Math.max(0,parseFloat(t.value)||0)}
- else if(t.hasAttribute("data-cost")){style="c";paint()}
  if(t.id==="country"){var cn=t.value.trim(),cc=CUR[cn];if(cc){$("cur").value=cc;autoRate(cc)}buildCityList(cn)}
  if(t.id==="cp")$("cpc").disabled=t.value!=="c";
  if(t.id==="man")$("days").disabled=!t.checked;
@@ -340,7 +337,7 @@ document.addEventListener("click",function(e){var t=e.target;
  if(t.dataset.s){bpm=false;setStyle(t.dataset.s);calc()}
  if(t.dataset.del!==undefined){cities.splice(+t.dataset.del,1);drawC();calc()}});
 $("addc").onclick=function(){var l=cities[cities.length-1]||{d:3,stay:150000,food:100000,local:50000,act:0};cities.push({n:"Kota "+(cities.length+1),d:3,stay:l.stay,food:l.food,local:l.local,act:0});drawC();calc()};
-$("bpm").onclick=function(){bpm=!bpm;if(bpm){setStyle("h");$("cp").value="10";$("cpc").disabled=true}else setStyle("b");calc()};
+$("bpm").onclick=function(){bpm=!bpm;if(bpm){setStyle("h");$("cp").value="10";$("cpc").disabled=true}else setStyle("n");calc()};
 function msg(t){$("cm").textContent=t}
 function copyText(txt,ta,out){
  function say(t){out.textContent=t}
