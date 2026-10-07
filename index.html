@@ -70,7 +70,7 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 <div class="grid"><div id="in">
 
 <details open><summary>🧭 Perjalanan</summary><div class="g2">
-<div><label for="country">Negara tujuan</label><input id="country" list="cl" data-l="Negara"><datalist id="cl"><option>Thailand</option><option>Malaysia</option><option>Vietnam</option><option>Singapura</option><option>Jepang</option><option>Filipina</option><option>Korea Selatan</option></datalist></div>
+<div><label for="country">Negara tujuan</label><input id="country" list="cl" data-l="Negara" autocomplete="off" placeholder="mis. Turki"><datalist id="cl"></datalist></div>
 <div><label for="city">Kota tujuan</label><input id="city" data-l="Kota"></div>
 <div><label for="start">Tanggal mulai</label><input id="start" type="date"></div>
 <div><label for="end">Tanggal selesai</label><input id="end" type="date"></div>
@@ -79,7 +79,7 @@ ul{list-style:none;margin:0;padding:0}.lg{flex:1}.lg li{padding:6px 0;border-bot
 <div><label for="people">Jumlah orang</label><input id="people" type="number" min="1" inputmode="numeric" data-l="Jumlah orang"></div>
 <div><label for="cur">Mata uang lokal (kode)</label><input id="cur" maxlength="4" data-l="Mata uang"></div>
 <div><label for="rate" id="rl">Kurs: 1 THB = Rp</label><input id="rate" type="number" min="0" step="any" inputmode="decimal" data-l="Kurs"></div>
-</div><p class="hint">Kurs diisi sendiri, tidak diambil real-time. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p></details>
+</div><p class="hint" id="rhint">Pilih negara untuk mengisi mata uang &amp; kurs otomatis.</p><p class="hint">Saat memilih negara, kolom mata uang dan kurs terisi otomatis (kurs terbaru; cadangan perkiraan bila offline) dan tetap bisa diubah manual. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p></details>
 
 <details open><summary>🎚️ Gaya perjalanan</summary>
 <div class="seg" id="seg"><button data-s="h">Hemat</button><button data-s="b">Backpacker</button><button data-s="n">Nyaman</button><button data-s="c">Custom</button></div>
@@ -151,7 +151,27 @@ F.forEach(function(s,si){h+='<details><summary>'+s[0]+'</summary><div class="g2"
  h+='</div>'+(EX[si]||'')+'</details>'});
 $("secs").innerHTML=h;
 var LM=null,EXP=[],curDay=1,dayInit=false,xcat="mk",xcur="idr",ready=false,restoring=false,lastJ="",saveT=0,dF=[],dA=[],dAn=[],lastN=-1,REP="",RPT=null,cities=[],style="b",mult=1,bpm=false,A=null,B=null,warns={};
-var CUR={Thailand:"THB",Malaysia:"MYR",Vietnam:"VND",Singapura:"SGD",Jepang:"JPY",Filipina:"PHP","Korea Selatan":"KRW"};
+var CUR={"Thailand":"THB","Malaysia":"MYR","Vietnam":"VND","Singapura":"SGD","Jepang":"JPY","Filipina":"PHP","Korea Selatan":"KRW","Indonesia":"IDR","Tiongkok":"CNY","China":"CNY","Hong Kong":"HKD","Taiwan":"TWD","Makau":"MOP","India":"INR","Sri Lanka":"LKR","Nepal":"NPR","Maladewa":"MVR","Bangladesh":"BDT","Pakistan":"PKR","Bhutan":"BTN","Kamboja":"KHR","Laos":"LAK","Myanmar":"MMK","Brunei":"BND","Turki":"TRY","Georgia":"GEL","Azerbaijan":"AZN","Armenia":"AMD","Kazakhstan":"KZT","Uzbekistan":"UZS","Kirgistan":"KGS","Mongolia":"MNT","Uni Emirat Arab":"AED","Qatar":"QAR","Arab Saudi":"SAR","Oman":"OMR","Kuwait":"KWD","Bahrain":"BHD","Yordania":"JOD","Israel":"ILS","Libanon":"LBP","Iran":"IRR","Irak":"IQD","Mesir":"EGP","Maroko":"MAD","Tunisia":"TND","Aljazair":"DZD","Kenya":"KES","Tanzania":"TZS","Uganda":"UGX","Ethiopia":"ETB","Afrika Selatan":"ZAR","Namibia":"NAD","Botswana":"BWP","Ghana":"GHS","Nigeria":"NGN","Rwanda":"RWF","Inggris":"GBP","Irlandia":"EUR","Prancis":"EUR","Jerman":"EUR","Belanda":"EUR","Belgia":"EUR","Spanyol":"EUR","Portugal":"EUR","Italia":"EUR","Yunani":"EUR","Austria":"EUR","Finlandia":"EUR","Slowakia":"EUR","Slovenia":"EUR","Kroasia":"EUR","Luxembourg":"EUR","Malta":"EUR","Siprus":"EUR","Estonia":"EUR","Latvia":"EUR","Lituania":"EUR","Swiss":"CHF","Norwegia":"NOK","Swedia":"SEK","Denmark":"DKK","Islandia":"ISK","Ceko":"CZK","Hungaria":"HUF","Polandia":"PLN","Rumania":"RON","Bulgaria":"BGN","Serbia":"RSD","Bosnia":"BAM","Albania":"ALL","Makedonia Utara":"MKD","Ukraina":"UAH","Rusia":"RUB","Belarus":"BYN","Moldova":"MDL","Amerika Serikat":"USD","Kanada":"CAD","Meksiko":"MXN","Brasil":"BRL","Argentina":"ARS","Chili":"CLP","Peru":"PEN","Kolombia":"COP","Ekuador":"USD","Bolivia":"BOB","Uruguay":"UYU","Paraguay":"PYG","Kuba":"CUP","Kosta Rika":"CRC","Panama":"PAB","Guatemala":"GTQ","Republik Dominika":"DOP","Australia":"AUD","Selandia Baru":"NZD","Fiji":"FJD","Papua Nugini":"PGK","Kaledonia Baru":"XPF","Samoa":"WST","Tonga":"TOP"};
+var RFB={"THB":530,"MYR":3400,"VND":0.69,"SGD":12000,"JPY":113,"PHP":270,"KRW":11.7,"IDR":1,"CNY":2200,"HKD":2000,"TWD":510,"MOP":2500,"INR":180,"LKR":55,"NPR":2.4,"MVR":1050,"BDT":135,"PKR":57,"BTN":180,"KHR":4,"LAK":0.74,"MMK":7.7,"BND":12000,"TRY":364,"GEL":6000,"AZN":9500,"AMD":42,"KZT":33,"UZS":1.27,"KGS":185,"MNT":4.7,"AED":4400,"QAR":4450,"SAR":4300,"OMR":42000,"KWD":53000,"BHD":43000,"JOD":22800,"ILS":4400,"LBP":0.18,"IRR":0.39,"IQD":12.4,"EGP":330,"MAD":1600,"TND":5200,"DZD":120,"KES":125,"TZS":6.3,"UGX":4.4,"ETB":280,"ZAR":900,"NAD":900,"BWP":1150,"GHS":1050,"NGN":10,"RWF":11,"GBP":20500,"EUR":17500,"CHF":18000,"NOK":1500,"SEK":1550,"DKK":2350,"ISK":115,"CZK":700,"HUF":45,"PLN":4100,"RON":3500,"BGN":9000,"RSD":150,"BAM":9000,"ALL":170,"MKD":280,"UAH":390,"RUB":175,"BYN":5000,"MDL":900,"USD":16200,"CAD":11800,"MXN":850,"BRL":2900,"ARS":12,"CLP":17,"PEN":4300,"COP":3.8,"BOB":2350,"UYU":400,"PYG":2.2,"CUP":675,"CRC":31,"PAB":16200,"GTQ":2100,"DOP":280,"AUD":10600,"NZD":9700,"FJD":7200,"PGK":4100,"XPF":145,"WST":5900,"TOP":6900};
+var RATE_CACHE=null,rateNote="";
+function buildCountryList(){var d=$("cl");if(!d)return;d.innerHTML=Object.keys(CUR).map(function(c){return"<option>"+esc(c)+"</option>"}).join("")}
+function setRhint(t){var e=$("rhint");if(e)e.textContent=t}
+function liveRates(cb){
+ if(RATE_CACHE){cb(RATE_CACHE);return}
+ function go(u,alt){fetch(u,{cache:"force-cache"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){var m=d&&(d.idr||d.IDR);if(m){RATE_CACHE=m;cb(m)}else cb(null)}).catch(function(){alt?alt():cb(null)})}
+ go("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/idr.json",function(){
+  go("https://latest.currency-api.pages.dev/v1/currencies/idr.json")})}
+function autoRate(code){
+ code=(code||"").toUpperCase().trim();if(!code)return;
+ if(code==="IDR"){$("rate").value=1;setRhint("Mata uang lokal: IDR (Rupiah).");calc();return}
+ var fb=RFB[code];
+ if(fb){$("rate").value=fb;setRhint("Kurs "+code+" diisi otomatis (perkiraan). Mengambil kurs terbaru...");calc()}
+ else setRhint("Kurs "+code+" belum tersedia otomatis. Isi manual ya.");
+ liveRates(function(r){
+  if(!r)return;
+  var v=parseFloat(r[code.toLowerCase()]);
+  if(v>0){$("rate").value=Math.round(1/v);rateNote="Kurs "+code+" terisi otomatis dari data terbaru ("+new Date().toLocaleDateString("id-ID")+"). Bisa diubah manual.";setRhint(rateNote);calc()}
+  else if(!fb)setRhint("Kurs "+code+" tidak ditemukan. Isi manual ya.")})}
 var CAT=[["tr","✈️","Transportasi","#16453b"],["st","🏠","Akomodasi","#2f7a8f"],["fo","🍜","Makanan","#e0a526"],["ac","🎟️","Aktivitas","#b5573a"],["dc","🛂","Dokumen","#7a8c5a"],["ms","🛍️","Lain-lain","#9b6b9e"],["eg","🛡️","Dana darurat","#8a8fa3"]];
 function N(id){var r=parseFloat($(id).value);if(r<0){warns[$(id).dataset.l+" tidak boleh negatif, dihitung 0"]=1;return 0}return isFinite(r)?r:0}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
@@ -276,7 +296,7 @@ document.addEventListener("input",function(e){var t=e.target;
  if(t.id==="fpd"||t.id==="apd"){lastN=-1;lockFields();syncDays()}
  if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:Math.max(0,parseFloat(t.value)||0)}
  else if(t.hasAttribute("data-cost")){style="c";paint()}
- if(t.id==="country"&&CUR[t.value])$("cur").value=CUR[t.value];
+ if(t.id==="country"){var cc=CUR[t.value.trim()];if(cc){$("cur").value=cc;autoRate(cc)}}
  if(t.id==="cp")$("cpc").disabled=t.value!=="c";
  if(t.id==="man")$("days").disabled=!t.checked;
  if(t.id==="multi")lockMulti();
@@ -410,6 +430,6 @@ function initStore(){
 $("xadd").onclick=addExp;
 $("xcp").onclick=function(){var t=tripText();if(!t){$("xm2").textContent="Belum ada pengeluaran untuk direkap.";return}copyText(t,$("xbox"),$("xm2"))};
 $("xcsv").onclick=function(){if(!EXP.length){$("xm2").textContent="Belum ada pengeluaran untuk diunduh.";return}save("pengeluaran-trip.csv",csvText(),$("xm2"))};
-reset();initStore();
+buildCountryList();reset();autoRate($("cur").value);initStore();
 })();
 </script></body></html>
