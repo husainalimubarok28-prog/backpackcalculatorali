@@ -132,6 +132,11 @@ input,select,textarea{min-width:0;max-width:100%}
 <div><label for="rate" id="rl">Kurs: 1 THB = Rp</label><input id="rate" type="number" min="0" step="any" inputmode="decimal" data-l="Kurs"></div>
 </div><p class="hint" id="rhint">Pilih negara untuk mengisi mata uang &amp; kurs otomatis.</p><p class="hint">Saat memilih negara, kolom mata uang dan kurs terisi otomatis (kurs terbaru; cadangan perkiraan bila offline) dan tetap bisa diubah manual. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p><button class="btn sm" id="rfrate" type="button" style="margin-top:8px">↻ Perbarui kurs</button></details>
 
+<details><summary>🌍 Negara &amp; mata uang trip</summary>
+<p class="hint">Buat trip lintas negara. Negara utama sudah otomatis masuk; tambahkan negara lain di bawah. Setiap mata uang di sini bisa dipilih saat mencatat pengeluaran.</p>
+<div id="tc"></div>
+<button class="btn act" id="addtc" type="button">+ Tambah negara</button><p class="hint" id="tchint"></p></details>
+
 <details open><summary>🎚️ Gaya perjalanan</summary>
 <div class="seg" id="seg" style="grid-template-columns:1fr 1fr 1fr"><button data-s="h">Hemat</button><button data-s="n">Nyaman</button><button data-s="m">Mewah</button></div>
 <p class="hint" id="sh"></p></details>
@@ -181,8 +186,9 @@ input,select,textarea{min-width:0;max-width:100%}
 <p class="hint" id="xm3" role="status"></p></section>
 <section class="pn"><h2>Catat pengeluaran</h2>
 <label for="xa">Jumlah</label><input id="xa" type="text" inputmode="numeric" placeholder="0" autocomplete="off" data-money="1">
-<label>Mata uang</label><div class="seg" id="xcur" style="grid-template-columns:1fr 1fr"><button data-xcur="idr" aria-pressed="true">Rp</button><button data-xcur="loc" aria-pressed="false" id="xcl">Lokal</button></div>
+<label for="xsel">Mata uang</label><select id="xsel"></select>
 <p class="hint" id="xp"></p>
+<p class="hint" id="xbrk" style="margin-top:-4px"></p>
 <label>Kategori</label><div class="chips" id="xcat"></div>
 <div class="g2"><div><label for="xn">Catatan</label><input id="xn" maxlength="60" placeholder="mis. pad thai" autocomplete="off"></div><div><label for="xd">Hari ke</label><select id="xd"></select></div></div>
 <button class="btn act" id="xadd" style="width:100%;margin-top:14px;min-height:52px;font-size:17px">+ Tambah pengeluaran</button><p class="hint" id="xm" role="status"></p></section>
@@ -223,7 +229,7 @@ F.forEach(function(s,si){h+='<details><summary>'+s[0]+'</summary><div class="g2"
 $("secs").innerHTML=h;
 var DEFBASE={},CURBASE={},ID_BASE={local:60000,stay:200000,bf:25000,lunch:40000,dinner:40000,snack:15000,tix:250000},idMode=false,mode="int",store={int:null,id:null};
 for(var _bk in BASE){DEFBASE[_bk]=BASE[_bk];CURBASE[_bk]=BASE[_bk]}
-var LM=null,EXP=[],curDay=1,dayInit=false,xcat="mk",xcur="idr",ready=false,restoring=false,lastJ="",saveT=0,dF=[],dA=[],dAn=[],lastN=-1,REP="",RPT=null,cities=[],style="b",mult=1,bpm=false,A=null,B=null,warns={};
+var LM=null,EXP=[],curDay=1,dayInit=false,xcat="mk",xcur="IDR",ready=false,restoring=false,lastJ="",saveT=0,dF=[],dA=[],dAn=[],lastN=-1,REP="",RPT=null,cities=[],tcur=[],style="b",mult=1,bpm=false,A=null,B=null,warns={};
 var CUR={"Thailand":"THB","Malaysia":"MYR","Vietnam":"VND","Singapura":"SGD","Jepang":"JPY","Filipina":"PHP","Korea Selatan":"KRW","Korea Utara":"KPW","Indonesia":"IDR","Tiongkok":"CNY","China":"CNY","Hong Kong":"HKD","Taiwan":"TWD","Makau":"MOP","India":"INR","Sri Lanka":"LKR","Nepal":"NPR","Maladewa":"MVR","Bangladesh":"BDT","Pakistan":"PKR","Bhutan":"BTN","Kamboja":"KHR","Laos":"LAK","Myanmar":"MMK","Brunei":"BND","Turki":"TRY","Georgia":"GEL","Azerbaijan":"AZN","Armenia":"AMD","Kazakhstan":"KZT","Uzbekistan":"UZS","Kirgistan":"KGS","Tajikistan":"TJS","Turkmenistan":"TMT","Mongolia":"MNT","Afghanistan":"AFN","Antigua dan Barbuda":"XCD","Benin":"XOF","Burkina Faso":"XOF","Chad":"XAF","Djibouti":"DJF","Dominika":"XCD","Eritrea":"ERN","Gabon":"XAF","Gambia":"GMD","Grenada":"XCD","Guinea":"GNF","Guinea-Bissau":"XOF","Guinea Khatulistiwa":"XAF","Komoro":"KMF","Kongo":"XAF","RD Kongo":"CDF","Liberia":"LRD","Mali":"XOF","Mauritania":"MRU","Niger":"XOF","Republik Afrika Tengah":"XAF","Saint Kitts dan Nevis":"XCD","Saint Lucia":"XCD","Saint Vincent dan Grenadine":"XCD","Sao Tome dan Principe":"STN","Sierra Leone":"SLE","Timor Leste":"USD","Togo":"XOF","Uni Emirat Arab":"AED","Qatar":"QAR","Arab Saudi":"SAR","Oman":"OMR","Kuwait":"KWD","Bahrain":"BHD","Yordania":"JOD","Israel":"ILS","Palestina":"ILS","Libanon":"LBP","Iran":"IRR","Irak":"IQD","Suriah":"SYP","Yaman":"YER","Mesir":"EGP","Maroko":"MAD","Tunisia":"TND","Aljazair":"DZD","Libya":"LYD","Kenya":"KES","Tanzania":"TZS","Uganda":"UGX","Ethiopia":"ETB","Afrika Selatan":"ZAR","Namibia":"NAD","Botswana":"BWP","Ghana":"GHS","Nigeria":"NGN","Rwanda":"RWF","Tanjung Verde":"CVE","Mauritius":"MUR","Seychelles":"SCR","Madagaskar":"MGA","Senegal":"XOF","Zambia":"ZMW","Zimbabwe":"USD","Mozambik":"MZN","Malawi":"MWK","Eswatini":"SZL","Lesotho":"LSL","Angola":"AOA","Kamerun":"XAF","Pantai Gading":"XOF","Burundi":"BIF","Somalia":"SOS","Sudan":"SDG","Sudan Selatan":"SSP","Inggris":"GBP","Irlandia":"EUR","Prancis":"EUR","Jerman":"EUR","Belanda":"EUR","Belgia":"EUR","Spanyol":"EUR","Portugal":"EUR","Italia":"EUR","Yunani":"EUR","Austria":"EUR","Finlandia":"EUR","Slowakia":"EUR","Slovenia":"EUR","Kroasia":"EUR","Luxembourg":"EUR","Malta":"EUR","Siprus":"EUR","Estonia":"EUR","Latvia":"EUR","Lituania":"EUR","Kosovo":"EUR","Andorra":"EUR","Monako":"EUR","San Marino":"EUR","Vatikan":"EUR","Swiss":"CHF","Liechtenstein":"CHF","Norwegia":"NOK","Swedia":"SEK","Denmark":"DKK","Islandia":"ISK","Ceko":"CZK","Hungaria":"HUF","Polandia":"PLN","Rumania":"RON","Bulgaria":"BGN","Serbia":"RSD","Bosnia dan Herzegovina":"BAM","Albania":"ALL","Makedonia Utara":"MKD","Montenegro":"EUR","Ukraina":"UAH","Rusia":"RUB","Belarus":"BYN","Moldova":"MDL","Amerika Serikat":"USD","Kanada":"CAD","Meksiko":"MXN","Brasil":"BRL","Argentina":"ARS","Chili":"CLP","Peru":"PEN","Kolombia":"COP","Ekuador":"USD","Bolivia":"BOB","Uruguay":"UYU","Paraguay":"PYG","Venezuela":"VES","Kuba":"CUP","Kosta Rika":"CRC","Panama":"PAB","Guatemala":"GTQ","Honduras":"HNL","Nikaragua":"NIO","El Salvador":"USD","Belize":"BZD","Republik Dominika":"DOP","Haiti":"HTG","Jamaika":"JMD","Bahama":"BSD","Barbados":"BBD","Trinidad dan Tobago":"TTD","Puerto Rico":"USD","Guyana":"GYD","Suriname":"SRD","Australia":"AUD","Selandia Baru":"NZD","Fiji":"FJD","Papua Nugini":"PGK","Kaledonia Baru":"XPF","Samoa":"WST","Tonga":"TOP","Kepulauan Solomon":"SBD","Vanuatu":"VUV","Palau":"USD","Kiribati":"AUD","Mikronesia":"USD","Marshall":"USD","Nauru":"AUD","Tuvalu":"AUD"};
 var CITY={"Thailand":["Bangkok","Chiang Mai","Phuket","Pattaya","Krabi","Koh Samui","Ayutthaya","Chiang Rai","Hat Yai","Hua Hin","Kanchanaburi"],"Malaysia":["Kuala Lumpur","George Town (Penang)","Johor Bahru","Melaka","Kota Kinabalu","Kuching","Langkawi","Ipoh","Cameron Highlands","Kuala Terengganu"],"Vietnam":["Hanoi","Ho Chi Minh City","Da Nang","Hoi An","Hue","Nha Trang","Da Lat","Ha Long","Sapa","Phu Quoc"],"Singapura":["Singapura"],"Jepang":["Tokyo","Osaka","Kyoto","Sapporo","Nagoya","Fukuoka","Nara","Kobe","Hiroshima","Naha (Okinawa)","Yokohama","Hakone"],"Filipina":["Manila","Cebu","Boracay","Puerto Princesa (Palawan)","Davao","Baguio","Bohol","Iloilo","Siargao","Batangas"],"Korea Selatan":["Seoul","Busan","Incheon","Jeju","Daegu","Gyeongju","Gangneung","Jeonju","Sokcho","Suwon"],"Korea Utara":["Pyongyang"],"Indonesia":["Jakarta","Bogor","Bandung","Yogyakarta","Solo (Surakarta)","Semarang","Surabaya","Malang (Bromo)","Banyuwangi (Ijen)","Pacitan","Denpasar (Bali)","Ubud","Lombok (Kuta Mandalika)","Gili Trawangan","Sumbawa","Sumba","Labuan Bajo (Flores)","Ende","Maumere","Kupang","Raja Ampat","Wakatobi","Derawan","Maratua","Balikpapan","Banjarmasin","Pontianak","Samarinda","Tarakan","Makassar","Toraja","Manado (Bunaken)","Bitung","Gorontalo","Palu","Ambon","Ternate","Banda Neira","Morotai","Medan","Danau Toba","Bukit Lawang","Padang","Bukittinggi","Palembang","Bandar Lampung","Belitung","Bangka","Batam","Bintan"],"Tiongkok":["Beijing","Shanghai","Guangzhou","Shenzhen","Chengdu","Xi'an","Hangzhou","Guilin","Kunming","Zhangjiajie"],"China":["Beijing","Shanghai","Guangzhou","Shenzhen","Chengdu","Xi'an","Hangzhou","Guilin","Kunming","Zhangjiajie"],"Hong Kong":["Hong Kong"],"Taiwan":["Taipei","Kaohsiung","Taichung","Tainan","Hualien","Jiufen","Taitung"],"Makau":["Makau"],"India":["New Delhi","Mumbai","Jaipur","Agra","Varanasi","Goa","Bangalore","Chennai","Kolkata","Kochi","Udaipur","Rishikesh"],"Sri Lanka":["Colombo","Kandy","Galle","Ella","Nuwara Eliya","Negombo","Anuradhapura","Jaffna"],"Nepal":["Kathmandu","Pokhara","Chitwan","Lumbini","Nagarkot","Bhaktapur"],"Maladewa":["Male","Maafushi"],"Bangladesh":["Dhaka","Chittagong","Cox's Bazar","Sylhet"],"Pakistan":["Karachi","Lahore","Islamabad","Peshawar","Multan","Quetta","Hunza"],"Bhutan":["Thimphu","Paro","Punakha"],"Kamboja":["Phnom Penh","Siem Reap","Sihanoukville","Battambang","Kampot"],"Laos":["Vientiane","Luang Prabang","Vang Vieng","Pakse","Savannakhet"],"Myanmar":["Yangon","Mandalay","Bagan","Inle","Naypyidaw"],"Brunei":["Bandar Seri Begawan"],"Turki":["Istanbul","Ankara","Izmir","Antalya","Goreme (Cappadocia)","Bodrum","Bursa","Konya","Pamukkale","Trabzon","Marmaris","Alanya"],"Georgia":["Tbilisi","Batumi","Kutaisi","Kazbegi","Gori","Mestia"],"Azerbaijan":["Baku","Ganja","Gabala","Sheki"],"Armenia":["Yerevan","Gyumri","Vanadzor","Dilijan"],"Kazakhstan":["Almaty","Astana","Shymkent","Turkestan"],"Uzbekistan":["Tashkent","Samarkand","Bukhara","Khiva","Nukus"],"Kirgistan":["Bishkek","Osh","Karakol","Naryn"],"Tajikistan":["Dushanbe","Khujand"],"Turkmenistan":["Ashgabat","Mary","Turkmenabat"],"Mongolia":["Ulaanbaatar","Kharkhorin","Dalanzadgad (Gobi)"],"Afghanistan":["Kabul","Herat","Mazar-i-Sharif","Kandahar"],"Antigua dan Barbuda":["St. John's"],"Benin":["Cotonou","Porto-Novo","Ganvie"],"Burkina Faso":["Ouagadougou","Bobo-Dioulasso"],"Chad":["N'Djamena","Abeche"],"Djibouti":["Djibouti City"],"Dominika":["Roseau"],"Eritrea":["Asmara","Massawa"],"Gabon":["Libreville","Port-Gentil"],"Gambia":["Banjul","Serrekunda"],"Grenada":["St. George's"],"Guinea":["Conakry","Kankan"],"Guinea-Bissau":["Bissau","Bubaque"],"Guinea Khatulistiwa":["Malabo","Bata"],"Komoro":["Moroni","Mitsamiouli"],"Kongo":["Brazzaville","Pointe-Noire"],"RD Kongo":["Kinshasa","Goma","Lubumbashi","Bukavu"],"Liberia":["Monrovia","Gbarnga"],"Mali":["Bamako","Timbuktu","Djenne","Mopti"],"Mauritania":["Nouakchott","Nouadhibou"],"Niger":["Niamey","Agadez","Zinder"],"Republik Afrika Tengah":["Bangui","Bimbo"],"Saint Kitts dan Nevis":["Basseterre"],"Saint Lucia":["Castries","Soufriere"],"Saint Vincent dan Grenadine":["Kingstown"],"Sao Tome dan Principe":["Sao Tome","Santo Antonio"],"Sierra Leone":["Freetown","Bo"],"Timor Leste":["Dili","Baucau","Atauro"],"Togo":["Lome","Kpalime"],"Angola":["Luanda","Benguela","Lubango"],"Kamerun":["Yaounde","Douala","Bafoussam"],"Pantai Gading":["Abidjan","Yamoussoukro","Bouake"],"Burundi":["Bujumbura","Gitega"],"Somalia":["Mogadishu","Hargeisa","Kismayo"],"Sudan":["Khartoum","Omdurman","Port Sudan"],"Sudan Selatan":["Juba","Wau","Malakal"],"Kiribati":["Tarawa","Kiritimati"],"Mikronesia":["Palikir","Weno","Kolonia"],"Marshall":["Majuro","Ebeye"],"Nauru":["Yaren"],"Tuvalu":["Funafuti"],"Iran":["Tehran","Isfahan","Shiraz","Mashhad","Yazd","Tabriz"],"Irak":["Baghdad","Erbil","Basra","Mosul","Najaf","Karbala"],"Suriah":["Damaskus","Aleppo","Homs","Latakia"],"Libanon":["Beirut","Byblos","Tripoli","Baalbek","Sidon"],"Yordania":["Amman","Petra (Wadi Musa)","Aqaba","Wadi Rum","Jerash"],"Israel":["Tel Aviv","Yerusalem","Haifa","Eilat","Nazareth"],"Palestina":["Ramallah","Bethlehem","Hebron"],"Arab Saudi":["Riyadh","Jeddah","Mekkah","Madinah","Dammam","AlUla","Taif"],"Uni Emirat Arab":["Dubai","Abu Dhabi","Sharjah","Ras Al Khaimah","Ajman","Fujairah","Al Ain"],"Qatar":["Doha","Al Wakrah","Al Khor"],"Oman":["Muscat","Salalah","Nizwa","Sur"],"Kuwait":["Kuwait City"],"Bahrain":["Manama","Muharraq"],"Yaman":["Sana'a","Aden","Taiz"],"Timor Leste":["Dili","Baucau"],"Mesir":["Kairo","Alexandria","Luxor","Aswan","Hurghada","Sharm El Sheikh","Dahab","Giza"],"Maroko":["Marrakesh","Casablanca","Fes","Chefchaouen","Rabat","Tangier","Agadir","Essaouira","Merzouga"],"Tunisia":["Tunis","Sousse","Hammamet","Djerba","Sfax"],"Aljazair":["Aljir","Oran","Constantine"],"Libya":["Tripoli","Benghazi"],"Kenya":["Nairobi","Mombasa","Diani","Naivasha","Maasai Mara","Nakuru"],"Tanzania":["Dar es Salaam","Arusha","Zanzibar","Serengeti","Moshi (Kilimanjaro)","Dodoma"],"Uganda":["Kampala","Entebbe","Jinja","Fort Portal"],"Ethiopia":["Addis Ababa","Gondar","Lalibela","Aksum"],"Afrika Selatan":["Cape Town","Johannesburg","Durban","Pretoria","Stellenbosch","Knysna","Gqeberha"],"Namibia":["Windhoek","Swakopmund","Walvis Bay","Sossusvlei"],"Botswana":["Gaborone","Maun","Kasane","Francistown"],"Ghana":["Accra","Kumasi","Cape Coast","Tamale"],"Nigeria":["Lagos","Abuja","Kano","Port Harcourt"],"Rwanda":["Kigali","Musanze","Gisenyi"],"Tanjung Verde":["Praia","Mindelo","Sal"],"Mauritius":["Port Louis","Grand Baie","Flic en Flac"],"Seychelles":["Victoria","Praslin","La Digue"],"Madagaskar":["Antananarivo","Nosy Be","Morondava"],"Senegal":["Dakar","Saint-Louis","Goree"],"Zambia":["Lusaka","Livingstone"],"Zimbabwe":["Harare","Victoria Falls","Bulawayo"],"Mozambik":["Maputo","Vilanculos","Pemba"],"Malawi":["Lilongwe","Blantyre","Mangochi"],"Eswatini":["Mbabane","Manzini"],"Lesotho":["Maseru"],"Inggris":["London","Manchester","Edinburgh","Liverpool","Oxford","Cambridge","Brighton","Bath","York","Bristol","Belfast","Glasgow"],"Irlandia":["Dublin","Cork","Galway","Limerick","Killarney"],"Prancis":["Paris","Nice","Lyon","Marseille","Bordeaux","Strasbourg","Toulouse","Cannes","Chamonix"],"Jerman":["Berlin","Munich","Frankfurt","Hamburg","Cologne","Dresden","Heidelberg","Nuremberg","Stuttgart","Dusseldorf"],"Belanda":["Amsterdam","Rotterdam","Den Haag","Utrecht","Eindhoven","Maastricht"],"Belgia":["Brussel","Brugge","Antwerpen","Gent","Leuven"],"Spanyol":["Madrid","Barcelona","Sevilla","Valencia","Granada","Malaga","Bilbao","Palma","San Sebastian","Toledo"],"Portugal":["Lisbon","Porto","Sintra","Faro","Funchal (Madeira)","Coimbra"],"Italia":["Roma","Milan","Venesia","Florence","Naples","Turin","Bologna","Verona","Cinque Terre","Amalfi","Palermo","Pisa"],"Yunani":["Athena","Thessaloniki","Santorini","Mykonos","Heraklion (Kreta)","Rhodes","Corfu"],"Austria":["Wina","Salzburg","Innsbruck","Graz","Hallstatt"],"Finlandia":["Helsinki","Rovaniemi","Turku","Tampere"],"Swiss":["Zurich","Genewa","Luzern","Bern","Interlaken","Zermatt","Basel"],"Norwegia":["Oslo","Bergen","Tromso","Stavanger","Trondheim"],"Swedia":["Stockholm","Gothenburg","Malmo","Kiruna"],"Denmark":["Kopenhagen","Aarhus","Odense"],"Islandia":["Reykjavik","Akureyri","Vik"],"Ceko":["Praha","Brno","Cesky Krumlov","Karlovy Vary"],"Hungaria":["Budapest","Debrecen","Szeged","Eger"],"Polandia":["Warsawa","Krakow","Gdansk","Wroclaw","Poznan"],"Rumania":["Bukares","Brasov","Cluj-Napoca","Sibiu","Timisoara"],"Bulgaria":["Sofia","Plovdiv","Varna","Burgas"],"Serbia":["Beograd","Novi Sad","Nis"],"Bosnia dan Herzegovina":["Sarajevo","Mostar","Banja Luka"],"Kroasia":["Zagreb","Dubrovnik","Split","Zadar","Hvar","Plitvice"],"Slovenia":["Ljubljana","Maribor","Bled"],"Slowakia":["Bratislava","Kosice"],"Albania":["Tirana","Berat","Saranda","Gjirokaster"],"Makedonia Utara":["Skopje","Ohrid"],"Montenegro":["Podgorica","Kotor","Budva"],"Kosovo":["Pristina","Prizren"],"Ukraina":["Kyiv","Lviv","Odesa","Kharkiv"],"Rusia":["Moskow","St. Petersburg","Kazan","Sochi","Vladivostok","Irkutsk"],"Belarus":["Minsk","Brest"],"Moldova":["Chisinau"],"Lituania":["Vilnius","Kaunas"],"Latvia":["Riga"],"Estonia":["Tallinn","Tartu"],"Malta":["Valletta","Sliema"],"Siprus":["Nicosia","Limassol","Paphos"],"Luxembourg":["Luxembourg City"],"Monako":["Monako"],"Andorra":["Andorra la Vella"],"Liechtenstein":["Vaduz"],"San Marino":["San Marino"],"Vatikan":["Vatikan"],"Amerika Serikat":["New York","Los Angeles","San Francisco","Chicago","Las Vegas","Miami","Washington DC","Boston","Seattle","Honolulu","Orlando","New Orleans","Denver"],"Kanada":["Toronto","Vancouver","Montreal","Quebec City","Calgary","Ottawa","Banff","Whistler"],"Meksiko":["Mexico City","Cancun","Guadalajara","Playa del Carmen","Tulum","Oaxaca","Puerto Vallarta","Merida"],"Brasil":["Rio de Janeiro","Sao Paulo","Brasilia","Salvador","Foz do Iguacu","Recife","Manaus"],"Argentina":["Buenos Aires","Mendoza","Bariloche","Cordoba","Ushuaia","Salta"],"Chili":["Santiago","Valparaiso","San Pedro de Atacama","Punta Arenas","Vina del Mar"],"Peru":["Lima","Cusco","Machu Picchu (Aguas Calientes)","Arequipa","Puno","Iquitos"],"Kolombia":["Bogota","Medellin","Cartagena","Cali","Santa Marta"],"Ekuador":["Quito","Guayaquil","Cuenca","Galapagos"],"Bolivia":["La Paz","Sucre","Uyuni","Santa Cruz"],"Uruguay":["Montevideo","Punta del Este","Colonia"],"Paraguay":["Asuncion","Ciudad del Este","Encarnacion"],"Venezuela":["Caracas","Maracaibo","Merida"],"Kuba":["Havana","Varadero","Trinidad","Santiago de Cuba"],"Kosta Rika":["San Jose","Arenal","Monteverde","Manuel Antonio"],"Panama":["Panama City","Bocas del Toro","Boquete"],"Guatemala":["Guatemala City","Antigua","Flores (Tikal)"],"Honduras":["Tegucigalpa","San Pedro Sula","Roatan"],"Nikaragua":["Managua","Granada","Leon","Ometepe"],"El Salvador":["San Salvador","Santa Ana","El Tunco"],"Belize":["Belize City","San Ignacio","Caye Caulker"],"Jamaika":["Kingston","Montego Bay","Negril","Ocho Rios"],"Haiti":["Port-au-Prince","Cap-Haitien"],"Republik Dominika":["Santo Domingo","Punta Cana","Puerto Plata"],"Puerto Rico":["San Juan","Ponce"],"Bahama":["Nassau","Freeport"],"Barbados":["Bridgetown"],"Trinidad dan Tobago":["Port of Spain"],"Guyana":["Georgetown"],"Suriname":["Paramaribo"],"Australia":["Sydney","Melbourne","Brisbane","Perth","Gold Coast","Cairns","Adelaide","Hobart","Darwin","Canberra","Uluru"],"Selandia Baru":["Auckland","Queenstown","Wellington","Christchurch","Rotorua","Dunedin"],"Fiji":["Nadi","Suva","Denarau"],"Papua Nugini":["Port Moresby","Lae","Mount Hagen"],"Kaledonia Baru":["Noumea"],"Samoa":["Apia"],"Tonga":["Nuku'alofa"],"Kepulauan Solomon":["Honiara"],"Vanuatu":["Port Vila"],"Palau":["Koror"]};
 function buildCityList(country){
@@ -369,7 +375,7 @@ function baseInt(){
  for(var k in DEFBASE)CURBASE[k]=DEFBASE[k];
  for(var k in DEF){if(NONM[k])$(k).value=DEF[k];else setMoney(k,DEF[k])}
  $("country").value="Thailand";$("city").value="Bangkok";$("start").value="2026-11-20";$("end").value="2026-11-26";$("man").checked=false;$("people").value=1;$("cur").value="THB";$("rate").value=500;
- $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];drawC();lockMulti();syncDays();
+ $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];tcur=[];drawC();drawTC();lockMulti();syncDays();
  A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="n";setLock(false);buildCityList("Thailand");$("days").disabled=true;
  setRhint("Pilih negara untuk mengisi mata uang & kurs otomatis.")}
 function baseID(){
@@ -379,7 +385,7 @@ function baseID(){
  for(var k in Fx)setMoney(k,Fx[k]);
  $("country").value="Indonesia";buildCityList("Indonesia");$("city").value="Yogyakarta";
  $("start").value="2026-11-20";$("end").value="2026-11-26";$("man").checked=false;$("people").value=1;$("cur").value="IDR";$("rate").value=1;
- $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];drawC();lockMulti();syncDays();
+ $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];tcur=[];drawC();drawTC();lockMulti();syncDays();
  A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="h";setLock(true);setStyle("h");$("days").disabled=true;
  setRhint("Mode dalam negeri: semua biaya dalam Rupiah (kurs 1). Pilih Hemat/Nyaman/Mewah atau ubah angkanya.")}
 function reset(){idMode?baseID():baseInt();paintMode();calc()}
@@ -398,7 +404,9 @@ document.addEventListener("input",function(e){var t=e.target;
   if(t.dataset.pd==="f")dF[i][+t.dataset.j]=v;else if(t.dataset.pd==="a")dA[i]=v;else dAn[i]=t.value;
   updF();updA();calc();return}
  if(t.id==="fpd"||t.id==="apd"){lastN=-1;lockFields();syncDays()}
-  if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:(t.dataset.money?parseMoney(t.value):Math.max(0,parseFloat(t.value)||0))}
+  if(t.dataset.tci!==undefined){var ti=+t.dataset.tci,tk=t.dataset.tck,x=tcur[ti];
+  if(x){if(tk==="c"){x.c=t.value;var ccx=CUR[t.value];if(ccx){x.cur=ccx;drawTC();tcurRate(ccx,function(rr){if(rr){x.rate=rr;drawTC()}})}}else if(tk==="cur")x.cur=t.value.toUpperCase().trim();else x.rate=Math.max(0,parseFloat(t.value)||0)}}
+ if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:(t.dataset.money?parseMoney(t.value):Math.max(0,parseFloat(t.value)||0))}
  if(t.id==="country"){var cn=t.value.trim(),cc=CUR[cn];if(cc){$("cur").value=cc;autoRate(cc)}buildCityList(cn)}
  if(t.id==="cp")$("cpc").disabled=t.value!=="c";
  if(t.id==="man")$("days").disabled=!t.checked;
@@ -406,12 +414,14 @@ document.addEventListener("input",function(e){var t=e.target;
  calc()});
 document.addEventListener("click",function(e){var t=e.target;
  if(t.dataset.v)showView(t.dataset.v);
- if(t.dataset.xcur){xcur=t.dataset.xcur;renderTrip();updPrev()}
  if(t.dataset.xk){xcat=t.dataset.xk;renderTrip()}
  if(t.dataset.xdel)delExp(t.dataset.xdel);
  if(t.dataset.m)setMode(t.dataset.m);
  if(t.dataset.s){bpm=false;setStyle(t.dataset.s);calc()}
+ if(t.dataset.tcdel!==undefined){tcur.splice(+t.dataset.tcdel,1);drawTC();renderTrip();calc()}
  if(t.dataset.del!==undefined){cities.splice(+t.dataset.del,1);drawC();calc()}});
+$("addtc").onclick=function(){tcur.push({c:"",cur:"",rate:0});drawTC();renderTrip();$("tchint").textContent="Isi nama negara; mata uang & kurs terisi otomatis."};
+$("xsel").onchange=function(){xcur=this.value;updPrev()};
 $("addc").onclick=function(){var l=cities[cities.length-1]||{d:3,stay:150000,food:100000,local:50000,act:0};cities.push({n:"Kota "+(cities.length+1),d:3,stay:l.stay,food:l.food,local:l.local,act:0});drawC();calc()};
 $("bpm").onclick=function(){bpm=!bpm;if(bpm){setStyle("h");$("cp").value="10";$("cpc").disabled=true}else setStyle("n");calc()};
 function msg(t){$("cm").textContent=t}
@@ -467,8 +477,29 @@ function autoDay(m){var d=sd();if(!d)return 1;var n=new Date(),t=new Date(n.getF
 function xmsg(t){$("xm").textContent=t}
 function showView(v){var tv=v==="t";$("pv").hidden=tv;$("tv").hidden=!tv;document.querySelector(".mbar").hidden=tv;
  document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===v)});window.scrollTo(0,0);renderTrip()}
-function updPrev(){var v=parseMoney($("xa").value),r=parseFloat($("rate").value)||0,c=($("cur").value||"").toUpperCase();
- $("xp").textContent=xcur==="loc"?(r>0?(v>0?"≈ "+rp(v*r):"Kurs: 1 "+(c||"lokal")+" = "+rp(r)):"Isi kurs di tab Rencana dulu"):""}
+var ZERODEC={JPY:1,KRW:1,VND:1,IDR:1,CLP:1,ISK:1,HUF:1,PYG:1,LAK:1,KHR:1,MMK:1};
+function fx(n,code){var z=ZERODEC[(code||"").toUpperCase()];return (z?Math.round(n):Math.round(n*100)/100).toLocaleString("id-ID",z?{maximumFractionDigits:0}:{maximumFractionDigits:2})}
+function tripCurrencies(){var list=[],seen={};
+ function add(c,cur,rate){cur=(cur||"").toUpperCase().trim();if(!cur||seen[cur])return;seen[cur]=1;list.push({cc:cur,c:c||cur,rate:rate})}
+ add($("country").value,$("cur").value,N("rate"));
+ tcur.forEach(function(x){add(x.c,x.cur,x.rate)});
+ return list}
+function curRate(code){code=(code||"").toUpperCase();
+ if(code==="IDR")return 1;
+ if(code===(($("cur").value||"").toUpperCase())){var r=N("rate");if(r>0)return r}
+ for(var i=0;i<tcur.length;i++){if((tcur[i].cur||"").toUpperCase()===code){var r2=parseFloat(tcur[i].rate)||0;if(r2>0)return r2}}
+ return 0}
+function tcurRate(code,cb){code=(code||"").toUpperCase();if(code==="IDR"){cb(1);return}
+ var fb=RFB[code]||0;if(fb)cb(fb);
+ liveRates(function(r){if(!r)return;var v=parseFloat(r[code.toLowerCase()]);if(v>0)cb(Math.round(1/v))})}
+function drawTC(){
+ var main=$("country").value||"";
+ $("tc").innerHTML=tcur.map(function(c,i){
+  return '<div class="city"><div class="n"><input data-tci="'+i+'" data-tck="c" value="'+esc(c.c)+'" list="cl" autocomplete="off" placeholder="Nama negara" aria-label="Negara tambahan"><button class="btn sm" data-tcdel="'+i+'" aria-label="Hapus negara">✕</button></div><div class="r"><div><label>Mata uang</label><input data-tci="'+i+'" data-tck="cur" maxlength="4" value="'+esc(c.cur)+'" placeholder="THB" aria-label="Mata uang"></div><div><label>Kurs: 1 unit = Rp</label><input data-tci="'+i+'" data-tck="rate" type="number" min="0" step="any" inputmode="decimal" value="'+(c.rate||"")+'" aria-label="Kurs"></div></div></div>'}).join("");
+ if(!tcur.length)$("tc").innerHTML='<p class="hint">Belum ada negara tambahan. Negara utama: <b>'+esc(main)+" ("+esc(($("cur").value||"").toUpperCase())+")</b>.</p>";
+ $("tchint").textContent=tcur.length?tcur.length+" negara tambahan aktif. Semua mata uang ini muncul di pilihan saat mencatat pengeluaran.":"";}
+function updPrev(){var v=parseMoney($("xa").value),cc=($("xsel").value||"IDR").toUpperCase(),r=cc==="IDR"?1:curRate(cc);
+ $("xp").textContent=cc==="IDR"?"":(r>0?(v>0?"≈ "+rp(v*r):"Kurs dipakai: 1 "+cc+" = "+rp(r)):"Kurs "+cc+" belum diisi. Isi di bagian Negara & mata uang trip.")}
 function catName(c){for(var i=0;i<XC.length;i++)if(XC[i][0]===c)return XC[i][2];return c}
 function catIcon(c){for(var i=0;i<XC.length;i++)if(XC[i][0]===c)return XC[i][1];return"•"}
 function renderTrip(){
@@ -478,12 +509,19 @@ function renderTrip(){
  if(!dayInit&&ready){curDay=autoDay(m);dayInit=true}
  if(curDay>days)curDay=days;if(curDay<1)curDay=1;
  var bud=Math.max(0,m.sub-m.pre),avg=bud/days,sisa=bud-spent,dS=byDay[curDay]||0,rem=Math.max(1,m.days-curDay+1);
- var allow=Math.max(0,(bud-(spent-dS))/rem),code=($("cur").value||"").toUpperCase();
+ var allow=Math.max(0,(bud-(spent-dS))/rem);
  $("tsisa").textContent=rs(sisa);$("tsp").textContent=rp(spent);$("tbd").textContent=rp(bud);$("tal").textContent=rp(allow);
  $("tsub").textContent=spent>bud?"⚠️ Melewati budget lokasi "+rp(spent-bud)+(m.t.eg>0?" (dana darurat "+rp(m.t.eg)+")":""):"Budget di luar tiket pesawat dan dokumen";
  $("tbar").style.width=(bud>0?Math.min(100,spent/bud*100):0)+"%";
- $("xcl").textContent=code||"Lokal";
- document.querySelectorAll("#xcur button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.xcur===xcur)});
+ var sel=$("xsel"),curList=tripCurrencies();
+ var so='<option value="IDR">🇮🇩 Rupiah (IDR)</option>'+curList.filter(function(x){return x.cc!=="IDR"}).map(function(x){return'<option value="'+esc(x.cc)+'">'+esc(x.c)+' ('+esc(x.cc)+')</option>'}).join("");
+ if(sel.innerHTML!==so)sel.innerHTML=so;
+ var have={IDR:1};curList.forEach(function(x){have[x.cc]=1});
+ if(!have[xcur])xcur="IDR";
+ sel.value=xcur;
+ var og={},grp={};EXP.forEach(function(e){var k=(e.cc||"IDR").toUpperCase();og[k]=(og[k]||0)+(e.oa||0);grp[k]=(grp[k]||0)+e.a});
+ var gk=Object.keys(og).filter(function(k){return k!=="IDR"});
+ $("xbrk").innerHTML=gk.length?"Dipakai: "+gk.map(function(k){return esc(k)+" "+fx(og[k],k)+" ≈ "+rp(grp[k])}).join(" · "):"";
  $("xcat").innerHTML=XC.map(function(c){return'<button data-xk="'+c[0]+'" aria-pressed="'+(c[0]===xcat)+'">'+c[1]+" "+c[2]+"</button>"}).join("");
  var o="";for(var i=1;i<=m.days;i++)o+='<option value="'+i+'"'+(i===curDay?" selected":"")+'>Hari '+i+(fmtD(i)?" · "+fmtD(i):"")+"</option>";
  if($("xd").innerHTML!==o)$("xd").innerHTML=o;$("xd").value=curDay;
@@ -494,7 +532,7 @@ function renderTrip(){
  $("xl").innerHTML=ds.length?ds.map(function(d){
   var it=EXP.filter(function(e){return e.d===d}).sort(function(a,b){return b.t-a.t});
   return'<div class="dr"><div style="display:flex;gap:8px;align-items:baseline"><b>Hari '+d+'</b><span class="hint" style="margin:0">'+fmtD(d)+'</span><b style="margin-left:auto;color:'+(byDay[d]>avg?"var(--bad)":"var(--ink)")+'">'+rp(byDay[d])+'</b></div><ul>'+it.map(function(e){
-   return'<li class="xi"><span>'+catIcon(e.c)+'</span><span>'+esc(e.n||catName(e.c))+(e.cc&&e.cc!=="IDR"?"<small>"+esc(e.cc)+" "+Math.round(e.oa*100)/100+"</small>":"")+'</span><b>'+rp(e.a)+'</b><button class="btn sm" data-xdel="'+esc(e.id)+'" aria-label="Hapus pengeluaran">✕</button></li>'}).join("")+"</ul></div>"}).join(""):'<p class="hint">Belum ada pengeluaran. Catat yang pertama di atas.</p>';
+   return'<li class="xi"><span>'+catIcon(e.c)+'</span><span>'+esc(e.n||catName(e.c))+(e.cc&&e.cc!=="IDR"?"<small>"+esc(e.cc)+" "+fx(e.oa,e.cc)+"</small>":"")+'</span><b>'+rp(e.a)+'</b><button class="btn sm" data-xdel="'+esc(e.id)+'" aria-label="Hapus pengeluaran">✕</button></li>'}).join("")+"</ul></div>"}).join(""):'<p class="hint">Belum ada pengeluaran. Catat yang pertama di atas.</p>';
  var pl={mk:m.t.fo,tp:Math.max(0,m.t.tr-m.fly),in:m.t.st,ak:m.t.ac,ln:m.t.ms};
  $("xr").innerHTML=XC.map(function(c){var v=byCat[c[0]]||0,p=pl[c[0]]||0,bad=v>p;
   return'<li><div class="t"><span>'+c[1]+'</span><span>'+c[2]+'</span><b>'+rp(v)+'</b></div><div class="hint" style="margin:2px 0 0">Rencana '+rp(p)+(bad?" · ⚠️ lewat "+rp(v-p):"")+'</div><div class="pb"><i style="width:'+(p>0?Math.min(100,v/p*100):(v>0?100:0))+'%;background:'+(bad?"var(--bad)":"var(--g)")+'"></i></div></li>'}).join("");
@@ -508,31 +546,33 @@ function renderTrip(){
  var sy=FB.user?("☁️ Tersinkron ke cloud sebagai "+(FB.user.displayName||FB.user.email||"")+(FB.when?" · terakhir "+new Date(FB.when).toLocaleString("id-ID"):"")):"📱 Tersimpan di perangkat ini. Masuk (panel atas) agar sinkron antar perangkat.";
  $("tsync").textContent=ready?sy:"Memuat data..."}
 function addExp(){
- var v=parseMoney($("xa").value),r=parseFloat($("rate").value)||0,code=($("cur").value||"").toUpperCase()||"LOKAL";
+ var v=parseMoney($("xa").value),cc=($("xsel").value||"IDR").toUpperCase(),r=cc==="IDR"?1:curRate(cc);
  if(!(v>0)){xmsg("Isi jumlah lebih dari 0.");return}
- if(xcur==="loc"&&!(r>0)){xmsg("Isi kurs di tab Rencana dulu.");return}
- var now=Date.now(),e={d:+$("xd").value||curDay,a:Math.round(xcur==="loc"?v*r:v),c:xcat,n:$("xn").value.trim().slice(0,60),cc:xcur==="loc"?code:"IDR",oa:v,t:now},id="e"+now+Math.random().toString(36).slice(2,6);
+ if(cc!=="IDR"&&!(r>0)){xmsg("Isi kurs "+cc+" di bagian Negara & mata uang trip dulu.");return}
+ var now=Date.now(),e={d:+$("xd").value||curDay,a:Math.round(v*(cc==="IDR"?1:r)),c:xcat,n:$("xn").value.trim().slice(0,60),cc:cc,oa:v,cr:cc==="IDR"?1:r,t:now},id="e"+now+Math.random().toString(36).slice(2,6);
  e.id=id;EXP.push(e);lsSet("bp_exp",EXP);
- $("xa").value="";$("xn").value="";updPrev();xmsg("Tersimpan: "+rp(e.a));renderTrip();scheduleCloud();$("xa").focus()}
+ $("xa").value="";$("xn").value="";updPrev();xmsg("Tersimpan: "+(cc!=="IDR"?cc+" "+fx(v,cc)+" (":"")+rp(e.a)+(cc!=="IDR"?")":""));renderTrip();scheduleCloud();$("xa").focus()}
 function delExp(id){
  EXP=EXP.filter(function(e){return e.id!==id});lsSet("bp_exp",EXP);renderTrip();scheduleCloud()}
 function tripText(){
  var m=LM;if(!m||!EXP.length)return"";var tot=0,L=["REKAP PENGELUARAN TRIP",($("city").value||$("country").value||"Perjalanan")+" - "+m.days+" hari",""];
  var ds={};EXP.forEach(function(e){tot+=e.a;(ds[e.d]=ds[e.d]||[]).push(e)});
- Object.keys(ds).map(Number).sort(function(a,b){return a-b}).forEach(function(d){var t=0;ds[d].forEach(function(e){t+=e.a});L.push("Hari "+d+(fmtD(d)?" ("+fmtD(d)+")":"")+": "+rp(t));ds[d].sort(function(a,b){return a.t-b.t}).forEach(function(e){L.push("  - "+catName(e.c)+(e.n?" ("+e.n+")":"")+": "+rp(e.a))})});
- var bud=Math.max(0,m.sub-m.pre);L.push("","TOTAL PENGELUARAN SEMUA HARI: "+rp(tot),"Jumlah transaksi: "+EXP.length,"Total budget rencana: "+rp(m.total),"Budget di lokasi: "+rp(bud),"Sisa budget lokasi: "+rs(bud-tot),"Sisa dari total budget: "+rs(m.total-tot));return L.join("\n")}
+ Object.keys(ds).map(Number).sort(function(a,b){return a-b}).forEach(function(d){var t=0;ds[d].forEach(function(e){t+=e.a});L.push("Hari "+d+(fmtD(d)?" ("+fmtD(d)+")":"")+": "+rp(t));ds[d].sort(function(a,b){return a.t-b.t}).forEach(function(e){L.push("  - "+catName(e.c)+(e.n?" ("+e.n+")":"")+": "+rp(e.a)+(e.cc&&e.cc!=="IDR"?" ("+e.cc+" "+fx(e.oa,e.cc)+")":""))})});
+ var og={};EXP.forEach(function(e){var k=(e.cc||"IDR").toUpperCase();og[k]=(og[k]||0)+(e.oa||0)});
+ var gl=Object.keys(og).filter(function(k){return k!=="IDR"});
+ var bud=Math.max(0,m.sub-m.pre);L.push("","TOTAL PENGELUARAN SEMUA HARI: "+rp(tot),"Jumlah transaksi: "+EXP.length,"Total budget rencana: "+rp(m.total),"Budget di lokasi: "+rp(bud),"Sisa budget lokasi: "+rs(bud-tot),"Sisa dari total budget: "+rs(m.total-tot));if(gl.length)L.push("","PENGELUARAN ASLI PER MATA UANG");gl.forEach(function(k){L.push(k+" "+fx(og[k],k)+" ≈ "+rp(og[k]/(curRate(k)||1)))});return L.join("\n")}
 function csvText(){
- var rows=[["hari","tanggal","kategori","catatan","jumlah_rp","mata_uang","jumlah_asal"]];
- EXP.slice().sort(function(a,b){return a.d-b.d||a.t-b.t}).forEach(function(e){rows.push([e.d,fmtD(e.d),catName(e.c),e.n,e.a,e.cc,e.oa])});
+ var rows=[["hari","tanggal","kategori","catatan","jumlah_rp","mata_uang","jumlah_asal","kurs"]];
+ EXP.slice().sort(function(a,b){return a.d-b.d||a.t-b.t}).forEach(function(e){rows.push([e.d,fmtD(e.d),catName(e.c),e.n,e.a,e.cc,e.oa,e.cr||(e.cc==="IDR"?1:"")])});
  return"\ufeff"+rows.map(function(r){return r.map(function(c){return'"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(",")}).join("\n")}
-function coreSnap(){var o={f:{},cities:cities,dF:dF,dA:dA,dAn:dAn,style:style,mult:mult,bpm:bpm};
+function coreSnap(){var o={f:{},cities:cities,tcur:tcur,dF:dF,dA:dA,dAn:dAn,style:style,mult:mult,bpm:bpm};
  document.querySelectorAll("#pv [id]").forEach(function(el){if(el.tagName==="INPUT"||el.tagName==="SELECT")o.f[el.id]=el.type==="checkbox"?el.checked:el.value});return o}
 function applyCore(o){restoring=true;o=o||{};
  for(var k in (o.f||{})){var el=$(k);if(!el)continue;if(el.type==="checkbox")el.checked=!!o.f[k];else el.value=o.f[k]}fmtAllMoney();
- cities=o.cities||[];dF=o.dF||[];dA=o.dA||[];dAn=o.dAn||[];style=o.style||"n";mult=o.mult||1;bpm=!!o.bpm;
+ cities=o.cities||[];tcur=o.tcur||[];dF=o.dF||[];dA=o.dA||[];dAn=o.dAn||[];style=o.style||"n";mult=o.mult||1;bpm=!!o.bpm;
  for(var _ck in DEFBASE)CURBASE[_ck]=(idMode&&ID_BASE[_ck]!=null)?ID_BASE[_ck]:DEFBASE[_ck];
  $("cpc").disabled=$("cp").value!=="c";$("days").disabled=!$("man").checked;
- drawC();lastN=-1;lockMulti();paint();calc();restoring=false}
+ drawC();drawTC();lastN=-1;lockMulti();paint();calc();restoring=false}
 function applyPlan(o){if(!o)return;
  if(o.store){store={int:o.store.int||null,id:o.store.id||null};mode=o.mode==="id"?"id":"int";}
  else{mode=o.idMode?"id":"int";}
