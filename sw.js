@@ -1,4 +1,4 @@
-var CACHE = "bt-v2";
+var CACHE = "bt-v3";
 
 self.addEventListener("install", function (e) {
   self.skipWaiting();
