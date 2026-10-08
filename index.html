@@ -195,7 +195,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <section class="pn"><h2 id="xtt">Hari ini</h2><div id="xtd"></div></section>
 <section class="pn"><h2>Riwayat per hari</h2><div id="xl"></div></section>
 <section class="pn"><h2>Rekap per kategori</h2><ul class="lg" id="xr"></ul></section>
-<div class="top"><button class="btn" id="xcp">Salin rekap</button><button class="btn" id="xcsv">Unduh CSV</button></div><p class="hint" id="xm2" role="status"></p>
+<div class="top"><button class="btn pri" id="xpdf">Unduh PDF</button><button class="btn" id="xcp">Salin rekap</button><button class="btn" id="xcsv">Unduh CSV</button></div><p class="hint" id="xm2" role="status"></p>
 <textarea id="xbox" hidden readonly rows="8" aria-label="Teks rekap" style="width:100%;font:13px/1.4 monospace;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:8px"></textarea>
 </div></div>
 <div class="mbar"><span>Total<br><b id="mt"></b></span><span style="text-align:right">Per orang<br><b id="mp"></b></span></div>
@@ -571,6 +571,40 @@ function addExp(){
  $("xa").value="";$("xn").value="";updPrev();xmsg("Tersimpan: "+(cc!=="IDR"?cc+" "+fx(v,cc)+" (":"")+rp(e.a)+(cc!=="IDR"?")":""));renderTrip();scheduleCloud();$("xa").focus()}
 function delExp(id){
  EXP=EXP.filter(function(e){return e.id!==id});lsSet("bp_exp",EXP);renderTrip();scheduleCloud()}
+function expPdf(){
+ var rows=EXP.slice().sort(function(a,b){return a.d-b.d||a.t-b.t});
+ if(!rows.length){$("xm2").textContent="Belum ada pengeluaran untuk diunduh.";return}
+ var J=window.jspdf&&window.jspdf.jsPDF;
+ if(!J){save("rekap-pengeluaran-trip.txt",tripText(),$("xm2"));return}
+ var doc=new J({orientation:"landscape",unit:"mm",format:"a4"}),M=12,W=297,y=M+4;
+ var cw=[18,32,34,70,50,69],hd=["Hari","Tanggal","Kategori","Catatan","Jumlah (Rp)","Asal"];
+ function th(){row(hd,true,true)}
+ function row(c,b,sh){
+  if(y>195){doc.addPage();y=M+4;th()}
+  doc.setFont("helvetica",b?"bold":"normal");doc.setFontSize(9);
+  if(sh){doc.setFillColor(230,236,232);doc.rect(M,y-4.6,W-2*M,6.6,"F")}
+  var x=M;c.forEach(function(v,i){if(i===0)doc.text(String(v),x+1.5,y);else doc.text(String(v),x+cw[i]-1.5,y,{align:"right"});x+=cw[i]});y+=6.6}
+ function lines(arr,size,gap){
+  arr.forEach(function(l){doc.setFont("helvetica","normal");doc.setFontSize(size);doc.splitTextToSize(l,W-2*M).forEach(function(t){if(y>195){doc.addPage();y=M+4}doc.text(t,M,y);y+=gap})})}
+ var tot=0,byCat={},og={};
+ rows.forEach(function(e){tot+=e.a;byCat[e.c]=(byCat[e.c]||0)+e.a;var k=(e.cc||"IDR").toUpperCase();og[k]=(og[k]||0)+(e.oa||0)});
+ doc.setFont("helvetica","bold");doc.setFontSize(17);doc.text("Rekap Pengeluaran Trip",M,y);y+=7;
+ doc.setFont("helvetica","normal");doc.setFontSize(10);
+ doc.text((($("city").value)||($("country").value)||"Perjalanan")+" - "+(LM?LM.days:"?")+" hari · dicetak "+new Date().toLocaleString("id-ID"),M,y);y+=8;
+ doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Ringkasan",M,y);y+=6;
+ var sum=["Jumlah transaksi: "+rows.length,"TOTAL PENGELUARAN SEMUA HARI: "+rp(tot)];
+ if(LM){var bud=Math.max(0,LM.sub-LM.pre);sum.push("Total budget rencana: "+rp(LM.total),"Budget di lokasi: "+rp(bud),"Sisa budget lokasi: "+rs(bud-tot),"Sisa dari total budget: "+rs(LM.total-tot))}
+ lines(sum,10,5.2);y+=4;
+ doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Rekap per kategori",M,y);y+=6;
+ lines(XC.map(function(c){return c[2]+": "+rp(byCat[c[0]]||0)}),10,5.2);y+=4;
+ th();
+ rows.forEach(function(e){
+  var asal=e.cc&&e.cc!=="IDR"?(e.cc+" "+fx(e.oa,e.cc)+(e.cr?"  @ "+fx(e.cr):"")):"Rupiah";
+  row([e.d,fmtD(e.d),catName(e.c),e.n||"-",rp(e.a),asal],false,false)});
+ row(["","","","Subtotal",rp(tot),""],true,true);
+ var gl=Object.keys(og).filter(function(k){return k!=="IDR"});
+ if(gl.length){y+=6;if(y>185){doc.addPage();y=M+4}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Pengeluaran asli per mata uang",M,y);y+=6;doc.setFont("helvetica","normal");doc.setFontSize(10);gl.forEach(function(k){doc.text(k+" "+fx(og[k],k)+"  =  "+rp(og[k]/(curRate(k)||1)),M,y);y+=5.2})}
+ save("rekap-pengeluaran-trip.pdf",doc.output("blob"),$("xm2"))}
 function tripText(){
  var m=LM;if(!m||!EXP.length)return"";var tot=0,L=["REKAP PENGELUARAN TRIP",($("city").value||$("country").value||"Perjalanan")+" - "+m.days+" hari",""];
  var ds={};EXP.forEach(function(e){tot+=e.a;(ds[e.d]=ds[e.d]||[]).push(e)});
@@ -672,6 +706,7 @@ $("xclear").onclick=function(){
  if(!window.confirm("Hapus SEMUA catatan pengeluaran trip ini? Tidak bisa dibatalkan."))return;
  EXP=[];lsSet("bp_exp",EXP);renderTrip();scheduleCloud();$("xm3").textContent="Semua pengeluaran sudah dihapus."};
 $("xcp").onclick=function(){var t=tripText();if(!t){$("xm2").textContent="Belum ada pengeluaran untuk direkap.";return}copyText(t,$("xbox"),$("xm2"))};
+$("xpdf").onclick=function(){expPdf()};
 $("xcsv").onclick=function(){if(!EXP.length){$("xm2").textContent="Belum ada pengeluaran untuk diunduh.";return}save("pengeluaran-trip.csv",csvText(),$("xm2"))};
 $("fblogout").onclick=fbLogout;
 $("fbgoogle").onclick=fbGoogle;
