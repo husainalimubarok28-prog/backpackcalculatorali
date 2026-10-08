@@ -132,7 +132,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <div><label for="rate" id="rl">Kurs: 1 THB = Rp</label><input id="rate" type="number" min="0" step="any" inputmode="decimal" data-l="Kurs"></div>
 </div><p class="hint" id="rhint">Pilih negara untuk mengisi mata uang &amp; kurs otomatis.</p><p class="hint">Saat memilih negara, kolom mata uang dan kurs terisi otomatis (kurs terbaru; cadangan perkiraan bila offline) dan tetap bisa diubah manual. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p><button class="btn sm" id="rfrate" type="button" style="margin-top:8px">↻ Perbarui kurs</button></details>
 
-<details><summary>🌍 Negara &amp; mata uang trip</summary>
+<details open><summary>🌍 Negara &amp; mata uang trip</summary>
 <p class="hint">Buat trip lintas negara. Negara utama sudah otomatis masuk; tambahkan negara lain di bawah. Setiap mata uang di sini bisa dipilih saat mencatat pengeluaran.</p>
 <div id="tc"></div>
 <button class="btn act" id="addtc" type="button">+ Tambah negara</button><p class="hint" id="tchint"></p></details>
@@ -407,7 +407,7 @@ document.addEventListener("input",function(e){var t=e.target;
   if(t.dataset.tci!==undefined){var ti=+t.dataset.tci,tk=t.dataset.tck,x=tcur[ti];
   if(x){if(tk==="c"){x.c=t.value;var ccx=CUR[t.value];if(ccx){x.cur=ccx;drawTC();tcurRate(ccx,function(rr){if(rr){x.rate=rr;drawTC()}})}}else if(tk==="cur")x.cur=t.value.toUpperCase().trim();else x.rate=Math.max(0,parseFloat(t.value)||0)}}
  if(t.closest("#cities")){var c=cities[t.dataset.i];if(c)c[t.dataset.k]=t.dataset.k==="n"?t.value:(t.dataset.money?parseMoney(t.value):Math.max(0,parseFloat(t.value)||0))}
- if(t.id==="country"){var cn=t.value.trim(),cc=CUR[cn];if(cc){$("cur").value=cc;autoRate(cc)}buildCityList(cn)}
+ if(t.id==="country"){var cn=t.value.trim(),cc=CUR[cn];if(cc){$("cur").value=cc;autoRate(cc)}buildCityList(cn);drawTC()}
  if(t.id==="cp")$("cpc").disabled=t.value!=="c";
  if(t.id==="man")$("days").disabled=!t.checked;
  if(t.id==="multi")lockMulti();
@@ -493,11 +493,11 @@ function tcurRate(code,cb){code=(code||"").toUpperCase();if(code==="IDR"){cb(1);
  var fb=RFB[code]||0;if(fb)cb(fb);
  liveRates(function(r){if(!r)return;var v=parseFloat(r[code.toLowerCase()]);if(v>0)cb(Math.round(1/v))})}
 function drawTC(){
- var main=$("country").value||"";
- $("tc").innerHTML=tcur.map(function(c,i){
+ var main=$("country").value||"",mcur=($("cur").value||"").toUpperCase(),mrate=N("rate")||0;
+ var mc='<div class="city" style="opacity:.9"><div class="n"><span style="font-weight:700">'+esc(main||"Negara utama")+'</span> <span class="hint">(utama — diatur di kolom Perjalanan di atas)</span></div><div class="r"><div><label>Mata uang</label><input value="'+esc(mcur)+'" readonly aria-label="Mata uang utama"></div><div><label>Kurs: 1 unit = Rp</label><input value="'+(mrate||"")+'" readonly aria-label="Kurs utama"></div></div></div>';
+ $("tc").innerHTML=mc+tcur.map(function(c,i){
   return '<div class="city"><div class="n"><input data-tci="'+i+'" data-tck="c" value="'+esc(c.c)+'" list="cl" autocomplete="off" placeholder="Nama negara" aria-label="Negara tambahan"><button class="btn sm" data-tcdel="'+i+'" aria-label="Hapus negara">✕</button></div><div class="r"><div><label>Mata uang</label><input data-tci="'+i+'" data-tck="cur" maxlength="4" value="'+esc(c.cur)+'" placeholder="THB" aria-label="Mata uang"></div><div><label>Kurs: 1 unit = Rp</label><input data-tci="'+i+'" data-tck="rate" type="number" min="0" step="any" inputmode="decimal" value="'+(c.rate||"")+'" aria-label="Kurs"></div></div></div>'}).join("");
- if(!tcur.length)$("tc").innerHTML='<p class="hint">Belum ada negara tambahan. Negara utama: <b>'+esc(main)+" ("+esc(($("cur").value||"").toUpperCase())+")</b>.</p>";
- $("tchint").textContent=tcur.length?tcur.length+" negara tambahan aktif. Semua mata uang ini muncul di pilihan saat mencatat pengeluaran.":"";}
+ $("tchint").textContent=tcur.length?tcur.length+" negara tambahan aktif. Semua mata uang ini juga muncul di pilihan saat mencatat pengeluaran.":"Tambah negara lain yang dikunjungi di bawah.";}
 function updPrev(){var v=parseMoney($("xa").value),cc=($("xsel").value||"IDR").toUpperCase(),r=cc==="IDR"?1:curRate(cc);
  $("xp").textContent=cc==="IDR"?"":(r>0?(v>0?"≈ "+rp(v*r):"Kurs dipakai: 1 "+cc+" = "+rp(r)):"Kurs "+cc+" belum diisi. Isi di bagian Negara & mata uang trip.")}
 function catName(c){for(var i=0;i<XC.length;i++)if(XC[i][0]===c)return XC[i][2];return c}
