@@ -95,6 +95,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <div class="wrap">
 <h1>Backpacking Budget Calculator</h1>
 <p class="sub">Isi rencana, hasil langsung berubah. Hitungan jalan di browser.</p>
+<div class="seg" id="mseg" style="grid-template-columns:1fr 1fr;margin-bottom:14px"><button data-m="int" aria-pressed="true">🌏 Trip Luar Negeri</button><button data-m="id" aria-pressed="false">🇮🇩 Trip Dalam Negeri</button></div>
 <div class="seg" id="tabs" style="grid-template-columns:1fr 1fr;margin-bottom:16px"><button data-v="p" aria-pressed="true">📊 Rencana</button><button data-v="t" aria-pressed="false">🧾 Catat Trip</button></div>
 <section class="pn" id="acct" style="margin-bottom:16px">
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
@@ -109,7 +110,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <div id="pv"><div class="top"><button class="btn pri" id="bpm" aria-pressed="false">🎒 Mode Hemat</button><button class="btn" id="reset">Reset</button></div>
 <div class="grid"><div id="in">
 
-<details open><summary>🧭 Perjalanan</summary><div class="g2"><div class="full"><button class="btn act" id="idp" type="button" style="width:100%">🇮🇩 Preset Backpacking Indonesia</button></div>
+<details open><summary>🧭 Perjalanan</summary><div class="g2">
 <div><label for="country">Negara tujuan</label><input id="country" list="cl" data-l="Negara" autocomplete="off" placeholder="mis. Turki"><datalist id="cl"></datalist></div>
 <div><label for="city">Kota tujuan</label><input id="city" list="ctylist" data-l="Kota" autocomplete="off" placeholder="pilih negara dulu"><datalist id="ctylist"></datalist></div>
 <div><label for="start">Tanggal mulai</label><input id="start" type="date"></div>
@@ -210,7 +211,7 @@ F.forEach(function(s,si){h+='<details><summary>'+s[0]+'</summary><div class="g2"
   h+='<div><label for="'+f[0]+'">'+f[1]+'</label><input id="'+f[0]+'" '+(mny?'type="text" inputmode="numeric" autocomplete="off" data-money="1"':'type="number" min="0" step="any" inputmode="decimal"')+' data-l="'+f[1].replace(/ \(.*|\s\/.*/,"")+'"'+(f[3]?' data-cost':'')+'></div>'});
  h+='</div>'+(EX[si]||'')+'</details>'});
 $("secs").innerHTML=h;
-var DEFBASE={},CURBASE={},ID_BASE={local:60000,stay:200000,bf:25000,lunch:40000,dinner:40000,snack:15000,tix:250000},idMode=false;
+var DEFBASE={},CURBASE={},ID_BASE={local:60000,stay:200000,bf:25000,lunch:40000,dinner:40000,snack:15000,tix:250000},idMode=false,mode="int",store={int:null,id:null};
 for(var _bk in BASE){DEFBASE[_bk]=BASE[_bk];CURBASE[_bk]=BASE[_bk]}
 var LM=null,EXP=[],curDay=1,dayInit=false,xcat="mk",xcur="idr",ready=false,restoring=false,lastJ="",saveT=0,dF=[],dA=[],dAn=[],lastN=-1,REP="",RPT=null,cities=[],style="b",mult=1,bpm=false,A=null,B=null,warns={};
 var CUR={"Thailand":"THB","Malaysia":"MYR","Vietnam":"VND","Singapura":"SGD","Jepang":"JPY","Filipina":"PHP","Korea Selatan":"KRW","Korea Utara":"KPW","Indonesia":"IDR","Tiongkok":"CNY","China":"CNY","Hong Kong":"HKD","Taiwan":"TWD","Makau":"MOP","India":"INR","Sri Lanka":"LKR","Nepal":"NPR","Maladewa":"MVR","Bangladesh":"BDT","Pakistan":"PKR","Bhutan":"BTN","Kamboja":"KHR","Laos":"LAK","Myanmar":"MMK","Brunei":"BND","Turki":"TRY","Georgia":"GEL","Azerbaijan":"AZN","Armenia":"AMD","Kazakhstan":"KZT","Uzbekistan":"UZS","Kirgistan":"KGS","Tajikistan":"TJS","Turkmenistan":"TMT","Mongolia":"MNT","Afghanistan":"AFN","Antigua dan Barbuda":"XCD","Benin":"XOF","Burkina Faso":"XOF","Chad":"XAF","Djibouti":"DJF","Dominika":"XCD","Eritrea":"ERN","Gabon":"XAF","Gambia":"GMD","Grenada":"XCD","Guinea":"GNF","Guinea-Bissau":"XOF","Guinea Khatulistiwa":"XAF","Komoro":"KMF","Kongo":"XAF","RD Kongo":"CDF","Liberia":"LRD","Mali":"XOF","Mauritania":"MRU","Niger":"XOF","Republik Afrika Tengah":"XAF","Saint Kitts dan Nevis":"XCD","Saint Lucia":"XCD","Saint Vincent dan Grenadine":"XCD","Sao Tome dan Principe":"STN","Sierra Leone":"SLE","Timor Leste":"USD","Togo":"XOF","Uni Emirat Arab":"AED","Qatar":"QAR","Arab Saudi":"SAR","Oman":"OMR","Kuwait":"KWD","Bahrain":"BHD","Yordania":"JOD","Israel":"ILS","Palestina":"ILS","Libanon":"LBP","Iran":"IRR","Irak":"IQD","Suriah":"SYP","Yaman":"YER","Mesir":"EGP","Maroko":"MAD","Tunisia":"TND","Aljazair":"DZD","Libya":"LYD","Kenya":"KES","Tanzania":"TZS","Uganda":"UGX","Ethiopia":"ETB","Afrika Selatan":"ZAR","Namibia":"NAD","Botswana":"BWP","Ghana":"GHS","Nigeria":"NGN","Rwanda":"RWF","Tanjung Verde":"CVE","Mauritius":"MUR","Seychelles":"SCR","Madagaskar":"MGA","Senegal":"XOF","Zambia":"ZMW","Zimbabwe":"USD","Mozambik":"MZN","Malawi":"MWK","Eswatini":"SZL","Lesotho":"LSL","Angola":"AOA","Kamerun":"XAF","Pantai Gading":"XOF","Burundi":"BIF","Somalia":"SOS","Sudan":"SDG","Sudan Selatan":"SSP","Inggris":"GBP","Irlandia":"EUR","Prancis":"EUR","Jerman":"EUR","Belanda":"EUR","Belgia":"EUR","Spanyol":"EUR","Portugal":"EUR","Italia":"EUR","Yunani":"EUR","Austria":"EUR","Finlandia":"EUR","Slowakia":"EUR","Slovenia":"EUR","Kroasia":"EUR","Luxembourg":"EUR","Malta":"EUR","Siprus":"EUR","Estonia":"EUR","Latvia":"EUR","Lituania":"EUR","Kosovo":"EUR","Andorra":"EUR","Monako":"EUR","San Marino":"EUR","Vatikan":"EUR","Swiss":"CHF","Liechtenstein":"CHF","Norwegia":"NOK","Swedia":"SEK","Denmark":"DKK","Islandia":"ISK","Ceko":"CZK","Hungaria":"HUF","Polandia":"PLN","Rumania":"RON","Bulgaria":"BGN","Serbia":"RSD","Bosnia dan Herzegovina":"BAM","Albania":"ALL","Makedonia Utara":"MKD","Montenegro":"EUR","Ukraina":"UAH","Rusia":"RUB","Belarus":"BYN","Moldova":"MDL","Amerika Serikat":"USD","Kanada":"CAD","Meksiko":"MXN","Brasil":"BRL","Argentina":"ARS","Chili":"CLP","Peru":"PEN","Kolombia":"COP","Ekuador":"USD","Bolivia":"BOB","Uruguay":"UYU","Paraguay":"PYG","Venezuela":"VES","Kuba":"CUP","Kosta Rika":"CRC","Panama":"PAB","Guatemala":"GTQ","Honduras":"HNL","Nikaragua":"NIO","El Salvador":"USD","Belize":"BZD","Republik Dominika":"DOP","Haiti":"HTG","Jamaika":"JMD","Bahama":"BSD","Barbados":"BBD","Trinidad dan Tobago":"TTD","Puerto Rico":"USD","Guyana":"GYD","Suriname":"SRD","Australia":"AUD","Selandia Baru":"NZD","Fiji":"FJD","Papua Nugini":"PGK","Kaledonia Baru":"XPF","Samoa":"WST","Tonga":"TOP","Kepulauan Solomon":"SBD","Vanuatu":"VUV","Palau":"USD","Kiribati":"AUD","Mikronesia":"USD","Marshall":"USD","Nauru":"AUD","Tuvalu":"AUD"};
@@ -344,29 +345,40 @@ function syncDays(){
  $("fdays").innerHTML=fh;$("adays").innerHTML=ah;updF();updA()}
 function lockMulti(){var on=$("multi").checked;$("mb").hidden=!on;lockFields();
  if(on&&!cities.length){var fs=N("bf")+N("lunch")+N("dinner")+N("snack");cities=[{n:$("city").value||"Kota 1",d:Math.max(1,daysCalc()||3),stay:N("stay"),food:fs,local:N("local"),act:0}];drawC()}}
-function paint(){document.querySelectorAll("#seg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.s===style)});$("bpm").setAttribute("aria-pressed",bpm)}
+function paint(){document.querySelectorAll("#seg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.s===style)});$("bpm").setAttribute("aria-pressed",bpm);paintMode()}
 function setStyle(s){
  var mm={h:.6,n:1,m:2.2}[s]||1,old=mult;mult=mm;
  for(var k in CURBASE)setMoney(k,r5(CURBASE[k]*mm));
  cities.forEach(function(c){["stay","food","local","act"].forEach(function(k){c[k]=r5(c[k]/old*mm)})});drawC();
  style=s;paint()}
-function reset(){
- for(var k in DEFBASE)CURBASE[k]=DEFBASE[k];idMode=false;
+function setLock(on){["country","cur","rate"].forEach(function(i){var e=$(i);if(e)e.disabled=on})}
+function paintMode(){var s=$("mseg");if(s)s.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m===mode)})}
+function baseInt(){
+ for(var k in DEFBASE)CURBASE[k]=DEFBASE[k];
  for(var k in DEF){if(NONM[k])$(k).value=DEF[k];else setMoney(k,DEF[k])}
  $("country").value="Thailand";$("city").value="Bangkok";$("start").value="2026-11-20";$("end").value="2026-11-26";$("man").checked=false;$("people").value=1;$("cur").value="THB";$("rate").value=500;
  $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];drawC();lockMulti();syncDays();
- A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="n";paint();$("days").disabled=true;calc();buildCityList($("country").value)}
-function presetID(){
- reset();
- idMode=true;
+ A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="n";setLock(false);buildCityList("Thailand");$("days").disabled=true;
+ setRhint("Pilih negara untuk mengisi mata uang & kurs otomatis.")}
+function baseID(){
  for(var k in ID_BASE)CURBASE[k]=ID_BASE[k];
- $("country").value="Indonesia";buildCityList("Indonesia");$("city").value="Yogyakarta";
- $("cur").value="IDR";$("rate").value=1;
+ for(var k in DEF){if(NONM[k])$(k).value=DEF[k];else setMoney(k,DEF[k])}
  var Fx={fly1:1200000,fly2:1200000,bus:150000,train:100000,ferry:80000,apt:100000,tour:150000,actx:150000,ins:100000,sim:50000,laundry:30000,shop:300000,souv:150000,unexp:200000};
  for(var k in Fx)setMoney(k,Fx[k]);
- style="h";setStyle("h");
- setRhint("Preset Backpacking Indonesia aktif: Rupiah (kurs 1) dan harga perkiraan lokal. Pilih Hemat/Nyaman/Mewah atau ubah angkanya sesuai rencanamu.");
+ $("country").value="Indonesia";buildCityList("Indonesia");$("city").value="Yogyakarta";
+ $("start").value="2026-11-20";$("end").value="2026-11-26";$("man").checked=false;$("people").value=1;$("cur").value="IDR";$("rate").value=1;
+ $("cp").value="10";$("cpc").value=10;$("cpc").disabled=true;$("fpd").checked=false;$("apd").checked=false;dF=[];dA=[];dAn=[];lastN=-1;$("multi").checked=false;cities=[];drawC();lockMulti();syncDays();
+ A=B=null;$("na").value="Rute A";$("nb").value="Rute B";bpm=false;mult=1;style="h";setLock(true);setStyle("h");$("days").disabled=true;
+ setRhint("Mode dalam negeri: semua biaya dalam Rupiah (kurs 1). Pilih Hemat/Nyaman/Mewah atau ubah angkanya.")}
+function reset(){idMode?baseID():baseInt();paintMode();calc()}
+function setMode(m){
+ if(m===mode){paintMode();return}
+ store[mode]=coreSnap();
+ mode=m;idMode=(m==="id");
+ paintMode();
+ if(store[m])applyCore(store[m]);else{idMode?baseID():baseInt()}
  calc()}
+function presetID(){setMode("id")}
 document.addEventListener("focusin",function(e){var t=e.target;if(t&&t.dataset&&t.dataset.money&&String(t.value).trim()!==""){t.value=String(parseMoney(t.value));setTimeout(function(){try{t.select()}catch(x){}},0)}});
 document.addEventListener("focusout",function(e){var t=e.target;if(t&&t.dataset&&t.dataset.money)fmtMoney(t)});
 document.addEventListener("input",function(e){var t=e.target;
@@ -386,11 +398,11 @@ document.addEventListener("click",function(e){var t=e.target;
  if(t.dataset.xcur){xcur=t.dataset.xcur;renderTrip();updPrev()}
  if(t.dataset.xk){xcat=t.dataset.xk;renderTrip()}
  if(t.dataset.xdel)delExp(t.dataset.xdel);
+ if(t.dataset.m)setMode(t.dataset.m);
  if(t.dataset.s){bpm=false;setStyle(t.dataset.s);calc()}
  if(t.dataset.del!==undefined){cities.splice(+t.dataset.del,1);drawC();calc()}});
 $("addc").onclick=function(){var l=cities[cities.length-1]||{d:3,stay:150000,food:100000,local:50000,act:0};cities.push({n:"Kota "+(cities.length+1),d:3,stay:l.stay,food:l.food,local:l.local,act:0});drawC();calc()};
 $("bpm").onclick=function(){bpm=!bpm;if(bpm){setStyle("h");$("cp").value="10";$("cpc").disabled=true}else setStyle("n");calc()};
-$("idp").onclick=presetID;
 function msg(t){$("cm").textContent=t}
 function copyText(txt,ta,out){
  function say(t){out.textContent=t}
@@ -502,14 +514,20 @@ function csvText(){
  var rows=[["hari","tanggal","kategori","catatan","jumlah_rp","mata_uang","jumlah_asal"]];
  EXP.slice().sort(function(a,b){return a.d-b.d||a.t-b.t}).forEach(function(e){rows.push([e.d,fmtD(e.d),catName(e.c),e.n,e.a,e.cc,e.oa])});
  return"\ufeff"+rows.map(function(r){return r.map(function(c){return'"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(",")}).join("\n")}
-function snapshot(){var o={f:{},cities:cities,dF:dF,dA:dA,dAn:dAn,style:style,mult:mult,bpm:bpm,idMode:idMode};
+function coreSnap(){var o={f:{},cities:cities,dF:dF,dA:dA,dAn:dAn,style:style,mult:mult,bpm:bpm};
  document.querySelectorAll("#pv [id]").forEach(function(el){if(el.tagName==="INPUT"||el.tagName==="SELECT")o.f[el.id]=el.type==="checkbox"?el.checked:el.value});return o}
-function restore(o){restoring=true;
-  for(var k in o.f){var el=$(k);if(!el)continue;if(el.type==="checkbox")el.checked=!!o.f[k];else el.value=o.f[k]}fmtAllMoney();
- cities=o.cities||[];dF=o.dF||[];dA=o.dA||[];dAn=o.dAn||[];style=o.style||"b";mult=o.mult||1;bpm=!!o.bpm;idMode=!!o.idMode;
+function applyCore(o){restoring=true;o=o||{};
+ for(var k in (o.f||{})){var el=$(k);if(!el)continue;if(el.type==="checkbox")el.checked=!!o.f[k];else el.value=o.f[k]}fmtAllMoney();
+ cities=o.cities||[];dF=o.dF||[];dA=o.dA||[];dAn=o.dAn||[];style=o.style||"n";mult=o.mult||1;bpm=!!o.bpm;
  for(var _ck in DEFBASE)CURBASE[_ck]=(idMode&&ID_BASE[_ck]!=null)?ID_BASE[_ck]:DEFBASE[_ck];
  $("cpc").disabled=$("cp").value!=="c";$("days").disabled=!$("man").checked;
  drawC();lastN=-1;lockMulti();paint();calc();restoring=false}
+function applyPlan(o){if(!o)return;
+ if(o.store){store={int:o.store.int||null,id:o.store.id||null};mode=o.mode==="id"?"id":"int";}
+ else{mode=o.idMode?"id":"int";}
+ idMode=(mode==="id");paintMode();setLock(idMode);
+ if(o.store)applyCore(store[mode]);else applyCore(o)}
+function snapshot(){store[mode]=coreSnap();return {v:2,mode:mode,store:{int:store.int,id:store.id}}}
 var FB_CFG={apiKey:"AIzaSyA_GUm2cJ0R_ZhTEff7x_0_Y2V_Mplllq0",authDomain:"backpackcalculatorali-49734.firebaseapp.com",projectId:"backpackcalculatorali-49734",storageBucket:"backpackcalculatorali-49734.firebasestorage.app",messagingSenderId:"784181444649",appId:"1:784181444649:web:2fe3e5ddf6adbae8d9dc38"};
 var FB={auth:null,db:null,user:null,when:0,pushT:0,unsub:null,applying:false};
 try{firebase.initializeApp(FB_CFG);FB.auth=firebase.auth();FB.db=firebase.firestore();}catch(e){}
@@ -547,7 +565,7 @@ function fbSubscribe(){
  },function(err){$("ghmsg").textContent="Gagal sinkron: "+err.message;});}
 function fbApply(d,remote){
  FB.applying=true;
- if(d.plan)restore(d.plan);
+ if(d.plan)applyPlan(d.plan);
  EXP=(d.exp||[]).slice();lsSet("bp_exp",EXP);lsSet("bp_updated",remote);
  lastJ=JSON.stringify(snapshot());ready=true;renderTrip();
  FB.applying=false;FB.when=Date.now();
@@ -577,7 +595,7 @@ function schedSave(){clearTimeout(saveT);saveT=setTimeout(function(){
  var j=JSON.stringify(snapshot());if(j===lastJ)return;lastJ=j;
  lsSet("bp_plan",j);scheduleCloud()},700)}
 function initStore(){
- var j=lsGet("bp_plan");if(typeof j==="string"){lastJ=j;try{restore(JSON.parse(j))}catch(e){}}
+ var j=lsGet("bp_plan");if(typeof j==="string"){lastJ=j;try{applyPlan(JSON.parse(j))}catch(e){}}
  EXP=lsGet("bp_exp")||[];ready=true;renderTrip();fbInit()}
 $("xadd").onclick=addExp;
 $("xclear").onclick=function(){
