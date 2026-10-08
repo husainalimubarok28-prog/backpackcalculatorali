@@ -2,6 +2,11 @@
 <html lang="id"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Budget Traveling</title>
+<meta name="theme-color" content="#6B1F2A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script>try{var _t=localStorage.getItem("bp_theme");if(_t)document.documentElement.dataset.theme=_t}catch(e){}</script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#F5F0E6;--pn:#FBF8F1;--soft:#F1EADD;--ink:#1A1614;--mu:#6E6559;--ln:#E2D8C6;--ac:#6B1F2A;--add:#C07A3E;--g:#3F7D58;--bad:#D6402F;--sky:#7DB9DE;--warnbg:#F7E4E0;--warnink:#8C2F22;--warnln:#E3B8B1;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -100,11 +105,16 @@ input,select,textarea{min-width:0;max-width:100%}
 <section class="pn" id="acct" style="margin-bottom:16px">
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
 <div><b id="ghwho">Belum login</b><div class="hint" id="ghmsg" style="margin:2px 0 0">Masuk agar data sinkron antar perangkat.</div></div>
-<div><button class="btn" id="fblogout" hidden>Keluar</button></div>
+<div><button class="btn sm" id="theme" type="button" style="margin-right:6px">🌙 Gelap</button><button class="btn" id="fblogout" hidden>Keluar</button></div>
 </div>
 <div id="ghloginbox" style="margin-top:10px">
 <button class="btn pri" id="fbgoogle" type="button" style="width:100%"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" style="vertical-align:-3px;margin-right:8px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Masuk dengan Google</button>
 <p class="hint" style="margin-top:8px">Data disimpan di database Firebase-mu dan hanya bisa diakses oleh akunmu. Tanpa login, data tetap tersimpan di perangkat ini saja.</p>
+</div>
+<div style="margin-top:12px;border-top:1px solid var(--ln);padding-top:12px">
+<div class="top" style="margin:0"><button class="btn" id="bkdu" type="button">⬇️ Cadangkan data</button><button class="btn" id="bkup" type="button">⬆️ Pulihkan</button></div>
+<input type="file" id="bkfile" accept="application/json,.json" hidden>
+<p class="hint" id="acmsg" role="status"></p>
 </div>
 </section>
 <div id="pv"><div class="top"><button class="btn pri" id="bpm" aria-pressed="false">🎒 Mode Hemat</button><button class="btn" id="reset">Reset</button></div>
@@ -120,7 +130,7 @@ input,select,textarea{min-width:0;max-width:100%}
 <div><label for="people">Jumlah orang</label><input id="people" type="number" min="1" inputmode="numeric" data-l="Jumlah orang"></div>
 <div><label for="cur">Mata uang lokal (kode)</label><input id="cur" maxlength="4" data-l="Mata uang"></div>
 <div><label for="rate" id="rl">Kurs: 1 THB = Rp</label><input id="rate" type="number" min="0" step="any" inputmode="decimal" data-l="Kurs"></div>
-</div><p class="hint" id="rhint">Pilih negara untuk mengisi mata uang &amp; kurs otomatis.</p><p class="hint">Saat memilih negara, kolom mata uang dan kurs terisi otomatis (kurs terbaru; cadangan perkiraan bila offline) dan tetap bisa diubah manual. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p></details>
+</div><p class="hint" id="rhint">Pilih negara untuk mengisi mata uang &amp; kurs otomatis.</p><p class="hint">Saat memilih negara, kolom mata uang dan kurs terisi otomatis (kurs terbaru; cadangan perkiraan bila offline) dan tetap bisa diubah manual. Semua biaya di bawah dihitung per orang, kecuali penginapan (per kamar).</p><button class="btn sm" id="rfrate" type="button" style="margin-top:8px">↻ Perbarui kurs</button></details>
 
 <details open><summary>🎚️ Gaya perjalanan</summary>
 <div class="seg" id="seg" style="grid-template-columns:1fr 1fr 1fr"><button data-s="h">Hemat</button><button data-s="n">Nyaman</button><button data-s="m">Mewah</button></div>
@@ -228,7 +238,9 @@ function buildCountryList(){var d=$("cl");if(!d)return;d.innerHTML=Object.keys(C
 function setRhint(t){var e=$("rhint");if(e)e.textContent=t}
 function liveRates(cb){
  if(RATE_CACHE){cb(RATE_CACHE);return}
- function go(u,alt){fetch(u,{cache:"force-cache"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){var m=d&&(d.idr||d.IDR);if(m){RATE_CACHE=m;cb(m)}else cb(null)}).catch(function(){alt?alt():cb(null)})}
+ var c=lsGet("bp_rates");
+ if(c&&c.m&&c.t&&(Date.now()-c.t)<43200000){RATE_CACHE=c.m;cb(c.m);return}
+ function go(u,alt){fetch(u,{cache:"force-cache"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){var m=d&&(d.idr||d.IDR);if(m){RATE_CACHE=m;lsSet("bp_rates",{t:Date.now(),m:m});cb(m)}else cb(null)}).catch(function(){alt?alt():cb(null)})}
  go("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/idr.json",function(){
   go("https://latest.currency-api.pages.dev/v1/currencies/idr.json")})}
 function autoRate(code){
@@ -240,7 +252,7 @@ function autoRate(code){
  liveRates(function(r){
   if(!r)return;
   var v=parseFloat(r[code.toLowerCase()]);
-  if(v>0){$("rate").value=Math.round(1/v);rateNote="Kurs "+code+" terisi otomatis dari data terbaru ("+new Date().toLocaleDateString("id-ID")+"). Bisa diubah manual.";setRhint(rateNote);calc()}
+  if(v>0){$("rate").value=Math.round(1/v);rateNote="Kurs "+code+" terisi otomatis dari data terbaru ("+new Date().toLocaleString("id-ID")+"). Bisa diubah manual.";setRhint(rateNote);calc()}
   else if(!fb)setRhint("Kurs "+code+" tidak ditemukan. Isi manual ya.")})}
 var CAT=[["tr","✈️","Transportasi","#6B1F2A"],["st","🏠","Akomodasi","#7DB9DE"],["fo","🍜","Makanan","#C07A3E"],["ac","🎟️","Aktivitas","#3F7D58"],["dc","🛂","Dokumen","#8C8175"],["ms","🛍️","Lain-lain","#1A1614"],["eg","🛡️","Dana darurat","#5C5349"]];
 function N(id){var e=$(id);var r=e.dataset.money?parseMoney(e.value):parseFloat(e.value);if(r<0){warns[e.dataset.l+" tidak boleh negatif, dihitung 0"]=1;return 0}return isFinite(r)?r:0}
@@ -265,7 +277,7 @@ function model(){
  var nsing=$("nights").value===""?Math.max(0,days-1):Math.round(N("nights")),idx=0;
  cs.forEach(function(c,ci){
   var ns=multi?(ci===cs.length-1?Math.max(0,c.d-1):c.d):Math.min(c.d,nsing);
-  for(var k=0;k<c.d;k++){var d=D[idx+k];if(k<ns)d.st+=c.stay*rooms;d.fo+=c.food*ppl;d.lo+=c.local*ppl;d.ac+=c.act*ppl/c.d}
+  for(var k=0;k<c.d;k++){var d=D[idx+k];if(k<ns)d.st+=c.stay*rooms;d.fo+=c.food*ppl;d.lo+=c.local*ppl;d.ac+=(c.d>0?c.act*ppl/c.d:0)}
   idx+=c.d});
  if($("fpd").checked)D.forEach(function(d,i){var r=dF[i]||[0,0,0,0];d.fo=(r[0]+r[1]+r[2]+r[3])*ppl});
  if($("apd").checked)D.forEach(function(d,i){d.ac=(dA[i]||0)*ppl});
@@ -378,7 +390,6 @@ function setMode(m){
  paintMode();
  if(store[m])applyCore(store[m]);else{idMode?baseID():baseInt()}
  calc()}
-function presetID(){setMode("id")}
 document.addEventListener("focusin",function(e){var t=e.target;if(t&&t.dataset&&t.dataset.money&&String(t.value).trim()!==""){t.value=String(parseMoney(t.value));setTimeout(function(){try{t.select()}catch(x){}},0)}});
 document.addEventListener("focusout",function(e){var t=e.target;if(t&&t.dataset&&t.dataset.money)fmtMoney(t)});
 document.addEventListener("input",function(e){var t=e.target;
@@ -444,7 +455,7 @@ function pdf(){
  if(nt.length){y+=6;if(y>180){doc.addPage();y=M+4}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Catatan aktivitas",M,y);y+=6;doc.setFont("helvetica","normal");doc.setFontSize(10);nt.forEach(function(t){doc.text(t,M,y);y+=5.2})}
  save("laporan-budget-backpacking.pdf",doc.output("blob"))}
 $("cpy").onclick=function(){if(!REP){msg("Belum ada laporan. Isi jumlah hari dulu.");return}copyText(REP,$("cbox"),$("cm"))};$("pdf").onclick=pdf;
-$("reset").onclick=reset;$("sa").onclick=function(){snap("A")};$("sb").onclick=function(){snap("B")};
+$("reset").onclick=function(){if(window.confirm("Reset mode ini ke pengaturan awal? Isian saat ini akan diganti."))reset()};$("sa").onclick=function(){snap("A")};$("sb").onclick=function(){snap("B")};
 
 var XC=[["mk","🍜","Makan"],["tp","🚌","Transport"],["in","🏠","Inap"],["ak","🎟️","Aktivitas"],["ln","🛍️","Lain-lain"]];
 function rs(n){return n<0?"-"+rp(-n):rp(n)}
@@ -606,6 +617,16 @@ $("xcp").onclick=function(){var t=tripText();if(!t){$("xm2").textContent="Belum 
 $("xcsv").onclick=function(){if(!EXP.length){$("xm2").textContent="Belum ada pengeluaran untuk diunduh.";return}save("pengeluaran-trip.csv",csvText(),$("xm2"))};
 $("fblogout").onclick=fbLogout;
 $("fbgoogle").onclick=fbGoogle;
+function currentTheme(){var t=document.documentElement.getAttribute("data-theme");if(t)return t;return(window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches)?"dark":"light"}
+function themeUI(){var b=$("theme");if(b)b.textContent=currentTheme()==="dark"?"☀️ Terang":"🌙 Gelap"}
+$("theme").onclick=function(){var nt=currentTheme()==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",nt);try{localStorage.setItem("bp_theme",nt)}catch(e){}themeUI()};
+$("cur").addEventListener("change",function(){var c=this.value.toUpperCase().trim();this.value=c;if(c)autoRate(c)});
+$("rfrate").onclick=function(){RATE_CACHE=null;try{localStorage.removeItem("bp_rates")}catch(e){}var c=($("cur").value||"").toUpperCase().trim();if(!c){setRhint("Pilih negara/mata uang dulu.");return}setRhint("Memuat kurs "+c+" terbaru...");autoRate(c)};
+$("bkdu").onclick=function(){var data={app:"backpackcalculatorali",v:2,t:new Date().toISOString(),plan:snapshot(),exp:EXP};save("budget-traveling-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(data,null,2),$("acmsg"))};
+$("bkup").onclick=function(){$("bkfile").click()};
+$("bkfile").onchange=function(){var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||(!d.plan&&!d.exp))throw 0;if(d.plan)applyPlan(d.plan);EXP=Array.isArray(d.exp)?d.exp.slice():[];lsSet("bp_exp",EXP);var j=JSON.stringify(snapshot());lsSet("bp_plan",j);lastJ=j;renderTrip();scheduleCloud();$("acmsg").textContent="✅ Data berhasil dipulihkan dari cadangan."}catch(e){$("acmsg").textContent="⚠️ File cadangan tidak valid."}};r.readAsText(f);this.value=""};
+themeUI();
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 buildCountryList();reset();buildCityList($("country").value);autoRate($("cur").value);initStore();
 })();
 </script></body></html>
